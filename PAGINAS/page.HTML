@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIRBNB JH-LS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 400px;
+      width: 960px;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <header class="bg-white shadow-md p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-indigo-600">AIRBNB JH-LS</h1>
+    <nav>
+      <ul class="flex space-x-4">
+        <li><a href="#" class="text-gray-600 hover:text-indigo-600">Inicio</a></li>
+        <li><a href="#" class="text-gray-600 hover:text-indigo-600">Propiedades</a></li>
+        <li><a href="#" class="text-gray-600 hover:text-indigo-600">Reservas</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="p-6">
+    <div id="map" class="rounded-2xl shadow-md mb-6"></div>
+
+    <section>
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Propiedades Disponibles</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Tarjeta de propiedad -->
+        <div class="bg-white p-4 rounded-2xl shadow-md">
+          <img src="https://via.placeholder.com/300" alt="Propiedad" class="rounded-lg mb-4">
+          <h3 class="text-lg font-bold text-indigo-600">Apartamento en El Poblado</h3>
+          <p class="text-gray-600">$200,000 COP / noche</p>
+          <button class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">Reservar</button>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-md">
+            <img src="https://via.placeholder.com/300" alt="Propiedad" class="rounded-lg mb-4">
+            <h3 class="text-lg font-bold text-indigo-600">Apartamento en laureles</h3>
+            <p class="text-gray-600">$200,000 COP / noche</p>
+            <button class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">Reservar</button>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-md">
+          <img src="https://via.placeholder.com/300" alt="Propiedad" class="rounded-lg mb-4">
+          <h3 class="text-lg font-bold text-indigo-600">Apartamento en laureles</h3>
+          <p class="text-gray-600">$200,000 COP / noche</p>
+          <button class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">Reservar</button>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-md">
+          <img src="https://via.placeholder.com/300" alt="Propiedad" class="rounded-lg mb-4">
+          <h3 class="text-lg font-bold text-indigo-600">Apartamento en laureles</h3>
+          <p class="text-gray-600">$200,000 COP / noche</p>
+          <button class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">Reservar</button>
+        </div>
+        
+        <!-- Repite tarjetas según necesidad -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-white p-4 text-center shadow-md mt-6">
+    <p class="text-gray-600">&copy; 2025 Reservas Medellín. Todos los derechos reservados.</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    var map = L.map('map').setView([4.5709, -74.2973], 6);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+
+    L.marker([10.391, -75.4794]).addTo(map)
+      .bindPopup('<b>Apartamento en El Poblado</b><br>$200,000 COP / noche')
+      .openPopup();
+      
+    L.marker([4.711, -74.0721]).addTo(map)
+        .bindPopup('<b>Apartamento en laureles</b><br>$200,000 COP / noche')
+        .openPopup();
+
+    L.marker([5.0703, -75.5138]).addTo(map)
+        .bindPopup('<b>Apartamento en laureles</b><br>$200,000 COP / noche')
+        .openPopup();
+
+    L.marker([11.2408, -74.211]).addTo(map)
+        .bindPopup('<b>Apartamento en laureles</b><br>$200,000 COP / noche')
+        .openPopup();
+
+    L.marker([6.213490, -75.562853]).addTo(map)
+        .bindPopup('<b>Apartamento en laureles</b><br>$200,000 COP / noche')
+        .openPopup();
+  </script>
+</body>
+</html>
