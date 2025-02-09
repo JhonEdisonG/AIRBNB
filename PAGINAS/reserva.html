@@ -28,7 +28,6 @@
         <label for="out-time">Fecha de Salida:</label>
         <input type="date" id="out-time" name="out-time" required>
 
-        <button type="submit" class="reserve-btn">Confirmar Reserva</button>
       </form>
 
       <!-- Formulario de pago simulado (oculto inicialmente) -->
@@ -58,14 +57,19 @@
     const params = new URLSearchParams(window.location.search);
     const propertyId = params.get('id');
 
+    // Bloquear fechas anteriores
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('in-time').setAttribute('min', today);
+    document.getElementById('out-time').setAttribute('min', today);
+
     document.getElementById('reservation-form').addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const inTime = document.getElementById('in-time').value;
       const outTime = document.getElementById('out-time').value;
 
-      // Obtener el ID del usuario desde el localStorage o sessionStorage
-      const userId = localStorage.getItem('userId'); // Asegúrate de guardar el ID del usuario al iniciar sesión
+      // Obtener el ID del usuario desde el localStorage
+      const userId = localStorage.getItem('userId');
 
       if (!userId) {
         alert('Por favor, inicie sesión para realizar una reserva.');
@@ -90,8 +94,8 @@
 
         if (response.ok) {
           alert('Reserva realizada con éxito. Proceda al pago.');
-          document.getElementById('reservation-form').classList.add('hidden'); // Ocultar formulario de reserva
-          document.getElementById('payment-form').classList.remove('hidden'); // Mostrar formulario de pago
+          document.getElementById('reservation-form').classList.add('hidden');
+          document.getElementById('payment-form').classList.remove('hidden');
         } else {
           alert('Error al realizar la reserva: ' + result.message);
         }
@@ -102,38 +106,48 @@
     });
 
     // Simulación de pago
-    document.getElementById('payment-details').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    document.getElementById('reservation-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-      const cardNumber = document.getElementById('card-number').value;
-      const cardExpiry = document.getElementById('card-expiry').value;
-      const cardCvc = document.getElementById('card-cvc').value;
+        const inTime = document.getElementById('in-time').value;
+        const outTime = document.getElementById('out-time').value;
 
-      // Simular una API de pago ficticia
-      try {
-        const paymentResponse = await fetch('https://jsonplaceholder.typicode.com/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            cardNumber,
-            cardExpiry,
-            cardCvc
-          })
-        });
+        // Obtener el ID del usuario desde el localStorage
+        const userId = localStorage.getItem('userId');
 
-        const paymentResult = await paymentResponse.json();
-
-        if (paymentResponse.ok) {
-          alert('Pago simulado exitoso. ¡Gracias por su reserva!');
-          window.location.href = '/paginas/page.html'; // Redirigir al inicio
-        } else {
-          alert('Error en la simulación de pago.');
+        if (!userId) {
+            alert('Por favor, inicie sesión para realizar una reserva.');
+            return;
         }
-      } catch (error) {
-        console.error('Error en la simulación de pago:', error);
-        alert('Error en la simulación de pago.');
-      }
-    });
+
+        const reservationData = {
+            property_id: propertyId,
+            user_id: userId,
+            in_time: inTime,
+            out_time: outTime
+        };
+
+        try {
+            const response = await fetch('/reserve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reservationData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+            alert('Reserva realizada con éxito. Proceda al pago.');
+            document.getElementById('reservation-form').classList.add('hidden');
+            document.getElementById('payment-form').classList.remove('hidden');
+            } else {
+            alert('Error al realizar la reserva: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al realizar la reserva');
+        }
+        });
   </script>
 </body>
 </html>

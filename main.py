@@ -12,7 +12,6 @@ app = FastAPI()
 app.mount("/estilos", StaticFiles(directory="estilos"), name="estilos")
 app.mount("/paginas", StaticFiles(directory="paginas"), name="paginas")
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Permite todas las origenes (en producción, especifica los dominios permitidos)
@@ -34,6 +33,12 @@ class RegisterRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: str
     password: str
+
+class ReservationRequest(BaseModel):
+    property_id: int
+    user_id: int
+    in_time: str
+    out_time: str
 
 # Rutas
 @app.get("/")
@@ -70,22 +75,30 @@ async def login(user: LoginRequest):
         result = supabase.table("Users").select("*").eq("email", user.email).eq("password", user.password).execute()
         if not result.data:
             return JSONResponse(content={"message": "Correo o contraseña incorrectos"}, status_code=400)
-        return JSONResponse(content={"message": "Inicio de sesión exitoso"}, status_code=200)
+        return JSONResponse(content={"message": "Inicio de sesión exitoso", "user_id": result.data[0]['id']}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-class ReservationRequest(BaseModel):
-    property_id: int
-    user_id: int
-    in_time: str
-    out_time: str
 
 @app.post("/reserve")
 async def reserve(reservation: ReservationRequest):
     try:
+        # Verificar si el usuario existe
+        user = supabase.table("Users").select("*").eq("id", reservation.user_id).execute()
+        if not user.data:
+            return JSONResponse(content={"message": "Usuario no encontrado"}, status_code=404)
+
         # Convertir las fechas de string a datetime
         in_time = datetime.strptime(reservation.in_time, "%Y-%m-%d")
         out_time = datetime.strptime(reservation.out_time, "%Y-%m-%d")
+
+        # Verificar que las fechas no sean anteriores al día actual
+        if in_time < datetime.now() or out_time < datetime.now():
+            return JSONResponse(content={"message": "No puedes reservar fechas pasadas"}, status_code=400)
+
+        # Verificar si ya existe una reserva para la propiedad en esas fechas
+        existing_reservation = supabase.table("Bookings").select("*").eq("property_id", reservation.property_id).gte("in_time", in_time.isoformat()).lte("out_time", out_time.isoformat()).execute()
+        if existing_reservation.data:
+            return JSONResponse(content={"message": "La propiedad ya está reservada en esas fechas"}, status_code=400)
 
         # Insertar la reserva en la base de datos
         new_reservation = {
@@ -94,7 +107,7 @@ async def reserve(reservation: ReservationRequest):
             "in_time": in_time.isoformat(),
             "out_time": out_time.isoformat()
         }
-        response = supabase.table("Reservations").insert(new_reservation).execute()
+        response = supabase.table("Bookings").insert(new_reservation).execute()
 
         if response.status_code != 201:
             return JSONResponse(content={"message": "Error al realizar la reserva"}, status_code=500)
