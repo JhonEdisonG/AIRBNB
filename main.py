@@ -1,12 +1,15 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from supabase import create_client, Client
 from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.mount("/estilos", StaticFiles(directory="estilos"), name="estilos")
+app.mount("/paginas", StaticFiles(directory="paginas"), name="paginas")
 
-# Configuración de CORS para permitir solicitudes desde el frontend
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Permite todas las origenes (en producción, especifica los dominios permitidos)
@@ -32,7 +35,7 @@ class LoginRequest(BaseModel):
 # Rutas
 @app.get("/")
 def home():
-    return FileResponse("PAGINAS/page.html")
+    return FileResponse("paginas/page.html")
 
 @app.post("/register")
 async def register(user: RegisterRequest):

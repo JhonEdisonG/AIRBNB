@@ -8,12 +8,23 @@ body {
 
 /* Header */
 .header {
+  position: relative;
   background: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 1%;
+}
+
+.header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 1%;  /* Ajusta este valor para definir desde dónde empieza la línea */
+  right: 1%; /* Ajusta este valor para definir dónde termina la línea */
+  border-bottom: 2px solid #000000;
 }
 
 .logo {
@@ -117,29 +128,54 @@ body {
 .section-title {
   font-size: 20px;
   font-weight: bold;
-  color: #374151;
+  color: #4f46e5;
   margin-bottom: 16px;
+  margin-left: 20px;
+  position: relative;
 }
 
-/* Grid */
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 1%;  /* Ajusta este valor para definir desde dónde empieza la línea */
+  right: 1%; /* Ajusta este valor para definir dónde termina la línea */
+  border-bottom: 2px solid #000000;
+  margin-bottom: -20px;
+  margin-left: -20px;
+}
+
+/* Grid para alinear las propiedades */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
+  gap: 20px; /* Espacio entre las tarjetas */
+  justify-items: center; /* Centra los items dentro de cada celda del grid */
 }
 
 /* Tarjetas de propiedades */
 .card {
   background: white;
   padding: 16px;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;  /* Asegura que las tarjetas tengan el mismo tamaño */
+  width: 100%;   /* Hace que las tarjetas ocupen el 100% del espacio disponible */
+  box-sizing: border-box; /* Para asegurar que el padding no afecte el tamaño total */
 }
 
 .card img {
-  width: 100%;
+  width: 100%;  /* Hace que la imagen ocupe todo el ancho de la tarjeta */
+  height: 400px; 
+  max-height: 300px; /* Limita la altura de las imágenes para que no se estiren excesivamente */
   border-radius: 8px;
   margin-bottom: 12px;
+  object-fit: cover; /* Asegura que la imagen se ajuste sin distorsionarse */
 }
 
 .card h3 {
@@ -150,10 +186,10 @@ body {
 
 .card p {
   color: #6b7280;
+  flex-grow: 1; /* Hace que el texto ocupe el espacio disponible y no afecte el tamaño de la tarjeta */
 }
 
 .reserve-btn {
-  width: 100%;
   background: #4f46e5;
   color: white;
   padding: 10px;
@@ -161,6 +197,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   margin-top: 12px;
+  text-align: center;
 }
 
 .reserve-btn:hover {
