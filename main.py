@@ -4,7 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from supabase import create_client, Client
 from pydantic import BaseModel
+from dotenv import load_dotenv
 
+load_dotenv()
 app = FastAPI()
 app.mount("/estilos", StaticFiles(directory="estilos"), name="estilos")
 app.mount("/paginas", StaticFiles(directory="paginas"), name="paginas")
@@ -41,26 +43,30 @@ def home():
 async def register(user: RegisterRequest):
     try:
         # Verificar si el usuario ya existe
-        existing_user = supabase.table("usuarios").select("*").eq("email", user.email).execute()
+        existing_user = supabase.table("Users").select("*").eq("email", user.email).execute()
         if existing_user.data:
             return JSONResponse(content={"message": "El usuario ya existe"}, status_code=400)
 
         # Crear nuevo usuario
         new_user = {
-            "nombre": user.name,
+            "name": user.name,
             "email": user.email,
             "password": user.password  # En un caso real, esto debería estar hasheado
         }
-        supabase.table("usuarios").insert(new_user).execute()
+        response = supabase.table("Users").insert(new_user).execute()
+        if response.status_code != 201:
+            return JSONResponse(content={"message": "Error al registrar el usuario"}, status_code=500)
+        
         return JSONResponse(content={"message": "Usuario registrado con éxito"}, status_code=201)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error al registrar el usuario: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al registrar el usuario: {str(e)}")
 
 @app.post("/login")
 async def login(user: LoginRequest):
     try:
         # Buscar usuario
-        result = supabase.table("usuarios").select("*").eq("email", user.email).eq("password", user.password).execute()
+        result = supabase.table("Users").select("*").eq("email", user.email).eq("password", user.password).execute()
         if not result.data:
             return JSONResponse(content={"message": "Correo o contraseña incorrectos"}, status_code=400)
         return JSONResponse(content={"message": "Inicio de sesión exitoso"}, status_code=200)
