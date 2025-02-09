@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from supabase import create_client, Client
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 app = FastAPI()
@@ -72,3 +73,33 @@ async def login(user: LoginRequest):
         return JSONResponse(content={"message": "Inicio de sesión exitoso"}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+class ReservationRequest(BaseModel):
+    property_id: int
+    user_id: int
+    in_time: str
+    out_time: str
+
+@app.post("/reserve")
+async def reserve(reservation: ReservationRequest):
+    try:
+        # Convertir las fechas de string a datetime
+        in_time = datetime.strptime(reservation.in_time, "%Y-%m-%d")
+        out_time = datetime.strptime(reservation.out_time, "%Y-%m-%d")
+
+        # Insertar la reserva en la base de datos
+        new_reservation = {
+            "property_id": reservation.property_id,
+            "user_id": reservation.user_id,
+            "in_time": in_time.isoformat(),
+            "out_time": out_time.isoformat()
+        }
+        response = supabase.table("Reservations").insert(new_reservation).execute()
+
+        if response.status_code != 201:
+            return JSONResponse(content={"message": "Error al realizar la reserva"}, status_code=500)
+
+        return JSONResponse(content={"message": "Reserva realizada con éxito"}, status_code=201)
+    except Exception as e:
+        print(f"Error al realizar la reserva: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al realizar la reserva: {str(e)}")

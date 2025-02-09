@@ -196,5 +196,27 @@
         .bindPopup(`<b>${loc.name}</b><br>${loc.price}`);
     });
   </script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    const response = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+        localStorage.setItem('userId', result.user_id); // Guardar el ID del usuario
+        document.getElementById('login-message').textContent = "Inicio de sesión exitoso";
+        window.location.href = "/paginas/page.html"; // Redirigir al inicio
+    } else {
+        document.getElementById('login-message').textContent = result.message;
+    }
+    });
+  </script>
 </body>
 </html>
