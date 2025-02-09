@@ -6,91 +6,96 @@
   <title>AIRBNB JH-LS</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    #map {
-      height: 400px;
-      width: 960px;
-    }
-  </style>
+  <link rel="stylesheet" href="../estilos/styles.css">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2111/2111320.png" type="image/jpeg">
 </head>
 <body class="bg-gray-100">
-  <header class="bg-white shadow-md p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-indigo-600">AIRBNB JH-LS</h1>
+  <header class="header">
+    <h1 class="logo">AIRBNB JH-LS</h1>
     <nav>
-      <ul class="flex space-x-4">
-        <li><a href="#" class="text-gray-600 hover:text-indigo-600">Inicio</a></li>
-        <li><a href="#" class="text-gray-600 hover:text-indigo-600">Propiedades</a></li>
-        <li><a href="#" class="text-gray-600 hover:text-indigo-600">Reservas</a></li>
+      <ul class="nav-links">
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#">Propiedades</a></li>
+        <li><a href="#">Reservas</a></li>
       </ul>
     </nav>
   </header>
 
-  <main class="p-6">
-    <div id="map" class="rounded-2xl shadow-md mb-6"></div>
+  <main class="content">
+    <div id="map" class="map-container"></div>
 
     <section>
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Propiedades Disponibles</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Tarjeta de propiedad -->
-        <div class="bg-white p-4 rounded-2xl shadow-md">
-          <img src="https://via.placeholder.com/300" alt="Propiedad" class="rounded-lg mb-4">
-          <h3 class="text-lg font-bold text-indigo-600">Apartamento en El Poblado</h3>
-          <p class="text-gray-600">$200,000 COP / noche</p>
-          <button class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">Reservar</button>
+      <h2 class="section-title">Propiedades Disponibles</h2>
+      <div class="grid-container">
+
+        <!-- Propiedad 1 -->
+        <div class="card">
+          <img src="https://images.ctfassets.net/8lc7xdlkm4kt/33L5l2aTXdJAAEfw55n0Yh/7472faf6b498fdc11091fc65a5c69165/render-sobre-planos-saint-michel.jpg" alt="Apartamento en El Poblado">
+          <h3>Apartamento en El Poblado</h3>
+          <p>$450,000 COP / noche</p>
+          <a href="detalle.html?id=1" class="reserve-btn">Reservar</a>
         </div>
-        <div class="bg-white p-4 rounded-2xl shadow-md">
-            <img src="https://via.placeholder.com/300" alt="Propiedad" class="rounded-lg mb-4">
-            <h3 class="text-lg font-bold text-indigo-600">Apartamento en laureles</h3>
-            <p class="text-gray-600">$200,000 COP / noche</p>
-            <button class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">Reservar</button>
+
+        <!-- Propiedad 2 -->
+        <div class="card">
+          <img src="https://media-luna-hostel.cartagena-hotels.net/data/Photos/1080x700w/10392/1039228/1039228984/cartagena-media-luna-hostel-photo-1.JPEG" alt="Casa colonial en Cartagena">
+          <h3>Casa colonial en Cartagena</h3>
+          <p>$500,000 COP / noche</p>
+          <a href="detalle.html?id=2" class="reserve-btn">Reservar</a>
         </div>
-        <div class="bg-white p-4 rounded-2xl shadow-md">
-          <img src="https://via.placeholder.com/300" alt="Propiedad" class="rounded-lg mb-4">
-          <h3 class="text-lg font-bold text-indigo-600">Apartamento en laureles</h3>
-          <p class="text-gray-600">$200,000 COP / noche</p>
-          <button class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">Reservar</button>
+
+        <!-- Propiedad 3 -->
+        <div class="card">
+          <img src="https://latinexclusive.com/sites/default/files/styles/main_property_slide/public/api_file_downloads/3862061_1.jpg?itok=qxmdZ3oA" alt="Loft en Bogotá">
+          <h3>Loft en Bogotá</h3>
+          <p>$320,000 COP / noche</p>
+          <a href="detalle.html?id=3" class="reserve-btn">Reservar</a>
         </div>
-        <div class="bg-white p-4 rounded-2xl shadow-md">
-          <img src="https://via.placeholder.com/300" alt="Propiedad" class="rounded-lg mb-4">
-          <h3 class="text-lg font-bold text-indigo-600">Apartamento en laureles</h3>
-          <p class="text-gray-600">$200,000 COP / noche</p>
-          <button class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">Reservar</button>
+
+        <!-- Propiedad 4 -->
+        <div class="card">
+          <img src="https://asoaturquindio.com/wp-content/uploads/2023/09/cabanas-la-herradura-4-1.jpg" alt="Cabaña en el Eje Cafetero">
+          <h3>Cabaña en el Eje Cafetero</h3>
+          <p>$800,000 COP / noche</p>
+          <a href="detalle.html?id=4" class="reserve-btn">Reservar</a>
         </div>
-        
-        <!-- Repite tarjetas según necesidad -->
+
+        <!-- Propiedad 5 -->
+        <div class="card">
+          <img src="https://cf.bstatic.com/xdata/images/hotel/max500/151251581.jpg?k=02b942afead8be7bea67cd35453662d8a6ae787336565b884c55aca6dbedcd08&o=" alt="Hostal en Santa Marta">
+          <h3>Hostal en Santa Marta</h3>
+          <p>$50,000 COP / noche</p>
+          <a href="detalle.html?id=5" class="reserve-btn">Reservar</a>
+        </div>
+
       </div>
     </section>
   </main>
 
-  <footer class="bg-white p-4 text-center shadow-md mt-6">
-    <p class="text-gray-600">&copy; 2025 Reservas Medellín. Todos los derechos reservados.</p>
+  <footer class="footer">
+    <p>&copy; 2025 Reservas Medellín. Todos los derechos reservados.</p>
   </footer>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     var map = L.map('map').setView([4.5709, -74.2973], 6);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 
-    L.marker([10.391, -75.4794]).addTo(map)
-      .bindPopup('<b>Apartamento en El Poblado</b><br>$200,000 COP / noche')
-      .openPopup();
-      
-    L.marker([4.711, -74.0721]).addTo(map)
-        .bindPopup('<b>Apartamento en laureles</b><br>$200,000 COP / noche')
-        .openPopup();
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-    L.marker([5.0703, -75.5138]).addTo(map)
-        .bindPopup('<b>Apartamento en laureles</b><br>$200,000 COP / noche')
-        .openPopup();
+    const locations = [
+      { lat: 6.2088, lng: -75.5679, name: "Apartamento en El Poblado", price: "$450,000 COP / noche" },
+      { lat: 10.422385, lng: -75.544984, name: "Casa colonial en Cartagena", price: "$500,000 COP / noche" },
+      { lat: 4.711, lng: -74.0721, name: "Loft en Bogotá", price: "$320,000 COP / noche" },
+      { lat: 4.845385, lng: -75.582560, name: "Cabaña en el Eje Cafetero", price: "$800,000 COP / noche" },
+      { lat: 11.244911, lng: -74.211768, name: "Hostal en Santa Marta", price: "$50,000 COP / noche" }
+    ];
 
-    L.marker([11.2408, -74.211]).addTo(map)
-        .bindPopup('<b>Apartamento en laureles</b><br>$200,000 COP / noche')
-        .openPopup();
-
-    L.marker([6.213490, -75.562853]).addTo(map)
-        .bindPopup('<b>Apartamento en laureles</b><br>$200,000 COP / noche')
-        .openPopup();
+    locations.forEach(loc => {
+      L.marker([loc.lat, loc.lng]).addTo(map)
+        .bindPopup(`<b>${loc.name}</b><br>${loc.price}`);
+    });
   </script>
 </body>
 </html>
