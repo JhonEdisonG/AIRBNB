@@ -11,19 +11,48 @@
 </head>
 <body class="bg-gray-100">
   <header class="header">
-    <h1 class="logo">AIRBNB JH-LS</h1>
+    <h1 class="logo">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111320.png" alt="Logo">
+        AIRBNB JH-LS
+    </h1>
     <nav>
-      <ul class="nav-links">
-        <li><a href="#">Inicio</a></li>
-        <li><a href="#">Propiedades</a></li>
-        <li><a href="#">Reservas</a></li>
-      </ul>
+        <ul class="nav-links">
+            <li><a href="#" id="register-link">Registrarse</a></li>
+            <li><a href="#" id="login-link">Iniciar Sesión</a></li>
+        </ul>
     </nav>
   </header>
 
   <main class="content">
-    <div id="map" class="map-container"></div>
+    <!-- Modal de Registro -->
+    <div id="register-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Registrarse</h2>
+        <form id="register-form">
+          <input type="text" id="register-name" placeholder="Nombre" required>
+          <input type="email" id="register-email" placeholder="Correo electrónico" required>
+          <input type="password" id="register-password" placeholder="Contraseña" required>
+          <button type="submit">Registrarse</button>
+        </form>
+        <p id="register-message"></p>
+      </div>
+    </div>
 
+    <!-- Modal de Inicio de Sesión -->
+    <div id="login-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Iniciar Sesión</h2>
+        <form id="login-form">
+          <input type="email" id="login-email" placeholder="Correo electrónico" required>
+          <input type="password" id="login-password" placeholder="Contraseña" required>
+          <button type="submit">Iniciar Sesión</button>
+        </form>
+        <p id="login-message"></p>
+      </div>
+    </div>
+    <div id="map" class="map-container"></div>
     <section>
       <h2 class="section-title">Propiedades Disponibles</h2>
       <div class="grid-container">
@@ -78,9 +107,65 @@
   </main>
 
   <footer class="footer">
-    <p>&copy; 2025 Reservas Medellín. Todos los derechos reservados.</p>
+    <p>&copy; 2025 AIRBNB JH-LS. Todos los derechos reservados.</p>
   </footer>
 
+  <script>
+    // Lógica para abrir/cerrar modales
+    const registerLink = document.getElementById('register-link');
+    const loginLink = document.getElementById('login-link');
+    const registerModal = document.getElementById('register-modal');
+    const loginModal = document.getElementById('login-modal');
+    const closeButtons = document.querySelectorAll('.close');
+
+    registerLink.addEventListener('click', () => {
+        registerModal.classList.remove('hidden');
+    });
+
+    loginLink.addEventListener('click', () => {
+        loginModal.classList.remove('hidden');
+    });
+
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            registerModal.classList.add('hidden');
+            loginModal.classList.add('hidden');
+        });
+    });
+
+    // Lógica para enviar formularios
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+
+        const response = await fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        const result = await response.json();
+        document.getElementById('register-message').textContent = result.message;
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+        document.getElementById('login-message').textContent = result.message;
+    });
+  </script>
+  
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     var map = L.map('map').setView([4.5709, -74.2973], 6);

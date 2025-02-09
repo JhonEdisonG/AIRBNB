@@ -20,6 +20,14 @@ body {
   font-size: 24px;
   font-weight: bold;
   color: #4f46e5;
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
 }
 
 .nav-links {
@@ -35,6 +43,60 @@ body {
 
 .nav-links li a:hover {
   color: #4f46e5;
+}
+
+/* Modales */
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 10px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-content button:hover {
+  background: #4338ca;
+}
+
+.close {
+  cursor: pointer;
+  float: right;
+  font-size: 24px;
 }
 
 /* Mapa */
@@ -185,3 +247,4 @@ body {
 .back-btn:hover {
   background: #4338ca;
 }
+
