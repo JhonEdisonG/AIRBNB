@@ -11,13 +11,7 @@
 <body class="bg-gray-100">
   <header class="header">
     <h1 class="logo">AIRBNB JH-LS</h1>
-    <nav>
-      <ul>
-        <li><a href="page.html">Inicio</a></li>
-        <li><a href="#">Propiedades</a></li>
-        <li><a href="#">Reservas</a></li>
-      </ul>
-    </nav>
+    <a href="page.html" class="back-btn">← Volver al Inicio</a>
   </header>
 
   <main class="content">
@@ -26,6 +20,10 @@
       <h2 id="property-title"></h2>
       <p id="property-price"></p>
       <p id="property-description"></p>
+      <p id="property-address"></p>
+      <p id="property-rating"></p>
+      <ul id="property-amenities"></ul>
+      <a id="directions-btn" href="#" target="_blank" class="directions-btn">Cómo llegar</a>
     </div>
 
     <div id="map" class="map-container"></div>
@@ -43,35 +41,50 @@
         price: '$450,000 COP / noche',
         description: 'Hermoso apartamento en una de las mejores zonas de Medellín, cerca de centros comerciales y restaurantes.',
         img: 'https://images.ctfassets.net/8lc7xdlkm4kt/33L5l2aTXdJAAEfw55n0Yh/7472faf6b498fdc11091fc65a5c69165/render-sobre-planos-saint-michel.jpg',
-        coordinates: [6.2088, -75.5679]
+        coordinates: [6.2088, -75.5679],
+        address: 'Cl. 9 #37, El Poblado, Medellín, Antioquia',
+        amenities: ['Wi-Fi', 'Cocina equipada', 'Piscina', 'Estacionamiento'],
+        rating: '4.8'
       },
       2: {
         title: 'Casa colonial en Cartagena',
         price: '$500,000 COP / noche',
         description: 'Encantadora casa colonial con vistas al mar, en el centro histórico de Cartagena.',
         img: 'https://media-luna-hostel.cartagena-hotels.net/data/Photos/1080x700w/10392/1039228/1039228984/cartagena-media-luna-hostel-photo-1.JPEG',
-        coordinates: [10.422385, -75.544984]
+        coordinates: [10.422385, -75.544984],
+        address: '10-46 Media Luna 10, Getsemaní, Cartagena de Indias, Bolívar',
+        amenities: ['Wi-Fi', 'Terraza', 'Aire acondicionado', 'Desayuno incluido'],
+        rating: '4.7'
       },
       3: {
         title: 'Loft en Bogotá',
         price: '$320,000 COP / noche',
         description: 'Moderno loft en el centro de Bogotá, ideal para viajeros de negocios.',
         img: 'https://latinexclusive.com/sites/default/files/styles/main_property_slide/public/api_file_downloads/3862061_1.jpg?itok=qxmdZ3oA',
-        coordinates: [4.711, -74.0721]
+        coordinates: [4.711, -74.0721],
+        address: 'Av Suba #125-98, Bogotá',
+        amenities: ['Wi-Fi', 'Gimnasio', 'Ascensor', 'Seguridad 24/7'],
+        rating: '4.5'
       },
       4: {
         title: 'Cabaña en el Eje Cafetero',
         price: '$800,000 COP / noche',
         description: 'Cabaña rústica rodeada de naturaleza, perfecta para desconectarse y disfrutar del café colombiano.',
         img: 'https://asoaturquindio.com/wp-content/uploads/2023/09/cabanas-la-herradura-4-1.jpg',
-        coordinates: [4.845385, -75.582560]
+        coordinates: [4.845385, -75.582560],
+        address: '2 kilómetros antes de termales Santa Rosa por la desviación a la Paloma vereda, San RAMON, Santa Rosa de Cabal, Risaralda (Cabañas La Herradura)',
+        amenities: ['Wi-Fi', 'Chimenea', 'Jardín', 'Cafetera'],
+        rating: '4.9'
       },
       5: {
         title: 'Hostal en Santa Marta',
         price: '$50,000 COP / noche',
         description: 'Hostal económico a pocos minutos de la playa, ideal para mochileros y aventureros.',
         img: 'https://cf.bstatic.com/xdata/images/hotel/max500/151251581.jpg?k=02b942afead8be7bea67cd35453662d8a6ae787336565b884c55aca6dbedcd08&o=',
-        coordinates: [11.244911, -74.211768]
+        coordinates: [11.244911, -74.211768],
+        address: 'Cl. 14 #3-58, Comuna 2, Santa Marta, Magdalena',
+        amenities: ['Wi-Fi', 'Cocina compartida', 'Terraza', 'Desayuno incluido'],
+        rating: '4.3'
       }
     };
 
@@ -85,6 +98,19 @@
       document.getElementById('property-title').textContent = property.title;
       document.getElementById('property-price').textContent = property.price;
       document.getElementById('property-description').textContent = property.description;
+      document.getElementById('property-address').textContent = `Dirección: ${property.address}`;
+      document.getElementById('property-rating').textContent = `Calificación: ${property.rating}`;
+
+      const amenitiesList = document.getElementById('property-amenities');
+      property.amenities.forEach(amenity => {
+        const li = document.createElement('li');
+        li.textContent = amenity;
+        amenitiesList.appendChild(li);
+      });
+
+      // Botón de cómo llegar
+      const directionsBtn = document.getElementById('directions-btn');
+      directionsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${property.coordinates[0]},${property.coordinates[1]}`;
 
       // Inicializar el mapa
       const map = L.map('map').setView(property.coordinates, 15);
