@@ -28,6 +28,7 @@
         <label for="out-time">Fecha de Salida:</label>
         <input type="date" id="out-time" name="out-time" required>
 
+        <button type="submit" class="reserve-btn">Reservar</button>
       </form>
 
       <!-- Formulario de pago simulado (oculto inicialmente) -->
@@ -106,48 +107,17 @@
     });
 
     // Simulación de pago
-    document.getElementById('reservation-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    document.getElementById('payment-details').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-        const inTime = document.getElementById('in-time').value;
-        const outTime = document.getElementById('out-time').value;
+      const cardNumber = document.getElementById('card-number').value;
+      const cardExpiry = document.getElementById('card-expiry').value;
+      const cardCvc = document.getElementById('card-cvc').value;
 
-        // Obtener el ID del usuario desde el localStorage
-        const userId = localStorage.getItem('userId');
-
-        if (!userId) {
-            alert('Por favor, inicie sesión para realizar una reserva.');
-            return;
-        }
-
-        const reservationData = {
-            property_id: propertyId,
-            user_id: userId,
-            in_time: inTime,
-            out_time: outTime
-        };
-
-        try {
-            const response = await fetch('/reserve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(reservationData)
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-            alert('Reserva realizada con éxito. Proceda al pago.');
-            document.getElementById('reservation-form').classList.add('hidden');
-            document.getElementById('payment-form').classList.remove('hidden');
-            } else {
-            alert('Error al realizar la reserva: ' + result.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al realizar la reserva');
-        }
-        });
+      // Aquí podrías agregar la lógica para procesar el pago
+      alert('Pago simulado con éxito. ¡Gracias por su reserva!');
+      window.location.href = "/paginas/page.html"; // Redirigir al inicio
+    });
   </script>
 </body>
 </html>

@@ -110,7 +110,7 @@ async def reserve(reservation: ReservationRequest):
         response = supabase.table("Bookings").insert(new_reservation).execute()
 
         if response.status_code != 201:
-            return JSONResponse(content={"message": "Error al realizar la reserva"}, status_code=500)
+            return JSONResponse(content={"message": "Error al realizar la reserva", "details": str(response)}, status_code=500)
 
         return JSONResponse(content={"message": "Reserva realizada con éxito"}, status_code=201)
     except Exception as e:
