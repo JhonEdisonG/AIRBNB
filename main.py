@@ -16,7 +16,7 @@ app.mount("/paginas", StaticFiles(directory="paginas"), name="paginas")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permite todas las origenes (en producción, especifica los dominios permitidos)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -26,7 +26,6 @@ SUPABASE_URL = "https://otaedzxedjzadltjtvzu.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90YWVkenhlZGp6YWRsdGp0dnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkwNTA1NDUsImV4cCI6MjA1NDYyNjU0NX0.mPZLDBWtfzcq-rEatzAlzWGrwggABZlmLP4EyL1VfZ4"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Modelos Pydantic
 class RegisterRequest(BaseModel):
     name: str
     email: str
@@ -42,7 +41,6 @@ class ReservationRequest(BaseModel):
     in_time: str
     out_time: str
 
-# Rutas
 @app.get("/")
 def home():
     return FileResponse("paginas/page.html")
@@ -50,16 +48,14 @@ def home():
 @app.post("/register")
 async def register(user: RegisterRequest):
     try:
-        # Verificar si el usuario ya existe
         existing_user = supabase.table("Users").select("*").eq("email", user.email).execute()
         if existing_user.data:
             return JSONResponse(content={"message": "El usuario ya existe"}, status_code=400)
 
-        # Crear nuevo usuario
         new_user = {
             "name": user.name,
             "email": user.email,
-            "password": user.password  # En un caso real, esto debería estar hasheado
+            "password": user.password
         }
         response = supabase.table("Users").insert(new_user).execute()
         if response.status_code != 201:
@@ -73,7 +69,6 @@ async def register(user: RegisterRequest):
 @app.post("/login")
 async def login(user: LoginRequest):
     try:
-        # Buscar usuario
         result = supabase.table("Users").select("*").eq("email", user.email).eq("password", user.password).execute()
         if not result.data:
             return JSONResponse(content={"message": "Correo o contraseña incorrectos"}, status_code=400)
@@ -84,28 +79,23 @@ async def login(user: LoginRequest):
 @app.post("/reserve")
 async def reserve(reservation: ReservationRequest):
     try:
-        # Verificar si el usuario existe
         user = supabase.table("Users").select("*").eq("id", reservation.user_id).execute()
         if not user.data:
             return JSONResponse(content={"message": "Usuario no encontrado"}, status_code=404)
 
-        # Convertir las fechas de string a datetime
         try:
             in_time = datetime.strptime(reservation.in_time, "%Y-%m-%d")
             out_time = datetime.strptime(reservation.out_time, "%Y-%m-%d")
         except ValueError as e:
             return JSONResponse(content={"message": "Formato de fecha inválido. Use YYYY-MM-DD"}, status_code=400)
 
-        # Verificar que las fechas no sean anteriores al día actual
         if in_time < datetime.now() or out_time < datetime.now():
             return JSONResponse(content={"message": "No puedes reservar fechas pasadas"}, status_code=400)
 
-        # Verificar si ya existe una reserva para la propiedad en esas fechas
         existing_reservation = supabase.table("Bookings").select("*").eq("property_id", reservation.property_id).gte("in_time", in_time.isoformat()).lte("out_time", out_time.isoformat()).execute()
         if existing_reservation.data:
             return JSONResponse(content={"message": "La propiedad ya está reservada en esas fechas"}, status_code=400)
 
-        # Insertar la reserva en la base de datos
         new_reservation = {
             "property_id": reservation.property_id,
             "user_id": reservation.user_id,
@@ -113,12 +103,12 @@ async def reserve(reservation: ReservationRequest):
             "out_time": out_time.isoformat()
         }
 
-        # Debug: Imprimir los datos de reserva recibidos
+        #Hasheo
         print(f"Datos de reserva recibidos: {new_reservation}")
 
         response = supabase.table("Bookings").insert(new_reservation).execute()
-
-        # Debug: Imprimir la respuesta de Supabase
+        
+        #Hasheo
         print(f"Respuesta de Supabase: {response}")
 
         if not response.data:

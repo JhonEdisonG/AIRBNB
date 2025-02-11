@@ -28,7 +28,7 @@
       <p id="property-rating"></p>
       <ul id="property-amenities"></ul>
       <a id="directions-btn" href="#" target="_blank" class="directions-btn">Cómo llegar</a>
-      <a id="reserve-btn" href="/paginas/reserva.html?id=1" class="directions-btn">Reservar</a>
+      <a id="reserve-btn" href="reserva-bef.html" class="directions-btn">Reservar</a>
     </div>
 
     <div id="map" class="map-container"></div>
@@ -93,7 +93,6 @@
       }
     };
 
-    // Obtener ID de la URL
     const params = new URLSearchParams(window.location.search);
     const propertyId = params.get('id');
     const property = properties[propertyId];
@@ -107,28 +106,30 @@
       document.getElementById('property-rating').textContent = `Calificación: ${property.rating}`;
 
       const amenitiesList = document.getElementById('property-amenities');
-      property.amenities.forEach(amenity => {
+        property.amenities.forEach(amenity => {
         const li = document.createElement('li');
-        li.textContent = amenity;
-        amenitiesList.appendChild(li);
-      });
+      li.textContent = amenity;
+      amenitiesList.appendChild(li);
+    });
 
-      // Botón de cómo llegar
-      const directionsBtn = document.getElementById('directions-btn');
-      directionsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${property.coordinates[0]},${property.coordinates[1]}`;
+    const directionsBtn = document.getElementById('directions-btn');
+    directionsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${property.coordinates[0]},${property.coordinates[1]}`;
 
-      // Inicializar el mapa
-      const map = L.map('map').setView(property.coordinates, 15);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
-      
-      L.marker(property.coordinates).addTo(map)
-        .bindPopup(property.title)
-        .openPopup();
-    } else {
-      document.querySelector('.property-details').innerHTML = '<p>Propiedad no encontrada.</p>';
-    }
+    const reserveBtn = document.getElementById('reserve-btn');
+    reserveBtn.href = `/paginas/reserva-bef.html?id=${propertyId}`;
+
+    const map = L.map('map').setView(property.coordinates, 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+  
+    L.marker(property.coordinates).addTo(map)
+      .bindPopup(property.title)
+      .openPopup();
+  } 
+  else {
+  document.querySelector('.property-details').innerHTML = '<p>Propiedad no encontrada.</p>';
+}
   </script>
 </body>
 </html>

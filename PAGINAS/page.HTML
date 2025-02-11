@@ -25,7 +25,6 @@
   </header>
 
   <main class="content">
-    <!-- Modal de Registro -->
     <div id="register-modal" class="modal hidden">
       <div class="modal-content">
         <span class="close">&times;</span>
@@ -40,7 +39,6 @@
       </div>
     </div>
 
-    <!-- Modal de Inicio de Sesión -->
     <div id="login-modal" class="modal hidden">
       <div class="modal-content">
         <span class="close">&times;</span>
@@ -58,7 +56,6 @@
       <h2 class="section-title">Propiedades Disponibles</h2>
       <div class="grid-container">
 
-        <!-- Propiedad 1 -->
         <div class="card">
           <img src="https://images.ctfassets.net/8lc7xdlkm4kt/33L5l2aTXdJAAEfw55n0Yh/7472faf6b498fdc11091fc65a5c69165/render-sobre-planos-saint-michel.jpg" alt="Apartamento en El Poblado">
           <h3>Apartamento en El Poblado</h3>
@@ -66,9 +63,6 @@
           <br>
           <a href="/paginas/detalle.html?id=1" class="reserve-btn">Ver más</a>
         </div>
-    
-
-        <!-- Propiedad 2 -->
       
         <div class="card">
           <img src="https://media-luna-hostel.cartagena-hotels.net/data/Photos/1080x700w/10392/1039228/1039228984/cartagena-media-luna-hostel-photo-1.JPEG" alt="Casa colonial en Cartagena">
@@ -78,9 +72,6 @@
           <a href="/paginas/detalle.html?id=2" class="reserve-btn">Ver más</a>
         </div>
       
-
-        <!-- Propiedad 3 -->
-      
         <div class="card">
           <img src="https://latinexclusive.com/sites/default/files/styles/main_property_slide/public/api_file_downloads/3862061_1.jpg?itok=qxmdZ3oA" alt="Loft en Bogotá">
           <h3>Loft en Bogotá</h3>
@@ -88,10 +79,7 @@
           <br>          
           <a href="/paginas/detalle.html?id=3" class="reserve-btn">Ver más</a>
         </div>
-      
 
-        <!-- Propiedad 4 -->
-     
         <div class="card">
           <img src="https://asoaturquindio.com/wp-content/uploads/2023/09/cabanas-la-herradura-4-1.jpg" alt="Cabaña en el Eje Cafetero">
           <h3>Cabaña en el Eje Cafetero</h3>
@@ -99,10 +87,7 @@
           <br>
           <a href="/paginas/detalle.html?id=4" class="reserve-btn">Ver más</a>
         </div>
-      
 
-        <!-- Propiedad 5 -->
-      
         <div class="card">
           <img src="https://cf.bstatic.com/xdata/images/hotel/max500/151251581.jpg?k=02b942afead8be7bea67cd35453662d8a6ae787336565b884c55aca6dbedcd08&o=" alt="Hostal en Santa Marta">
           <h3>Hostal en Santa Marta</h3>
@@ -110,7 +95,6 @@
           <br>
           <a href="/paginas/detalle.html?id=5" class="reserve-btn">Ver más</a>
         </div>
-
     </div>
     </section>
   </main>
@@ -120,7 +104,6 @@
   </footer>
 
   <script>
-    // Lógica para abrir/cerrar modales
     const registerLink = document.getElementById('register-link');
     const loginLink = document.getElementById('login-link');
     const registerModal = document.getElementById('register-modal');
@@ -142,7 +125,6 @@
         });
     });
 
-    // Lógica para enviar formularios
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('register-name').value;
@@ -172,9 +154,9 @@
 
         const result = await response.json();
         if (response.ok) {
-            localStorage.setItem('userId', result.user_id); // Guardar el ID del usuario
+            localStorage.setItem('userId', result.user_id);
             document.getElementById('login-message').textContent = "Inicio de sesión exitoso";
-            window.location.href = "/paginas/page.html"; // Redirigir al inicio
+            window.location.href = "/paginas/page.html";
         } else {
             document.getElementById('login-message').textContent = result.message;
         }

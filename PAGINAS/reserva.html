@@ -20,22 +20,8 @@
 
   <main class="content">
     <div class="property-details">
-      <h2>Reservar Propiedad</h2>
-      <form id="reservation-form" class="reservation-form">
-        <div class="form-group">
-          <label for="in-time">Fecha de Entrada:</label>
-          <input type="date" id="in-time" name="in-time" required>
-        </div>
-        <div class="form-group">
-          <label for="out-time">Fecha de Salida:</label>
-          <input type="date" id="out-time" name="out-time" required>
-        </div>
-        <button type="submit" class="reserve-btn">Reservar</button>
-      </form>
-
-      <!-- Formulario de pago simulado (oculto inicialmente) -->
-      <div id="payment-form" class="hidden payment-form">
-        <h3>Simulación de Pago</h3>
+      <div id="payment-form" class="payment-form">
+        <h3>Pasarela JH-LS</h3>
         <form id="payment-details" class="payment-details">
           <div class="form-group">
             <label for="card-number">Número de Tarjeta:</label>
@@ -60,58 +46,6 @@
   </footer>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const propertyId = params.get('id');
-
-    // Bloquear fechas anteriores
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('in-time').setAttribute('min', today);
-    document.getElementById('out-time').setAttribute('min', today);
-
-    document.getElementById('reservation-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const inTime = document.getElementById('in-time').value;
-      const outTime = document.getElementById('out-time').value;
-
-      // Obtener el ID del usuario desde el localStorage
-      const userId = localStorage.getItem('userId');
-
-      if (!userId) {
-          alert('Por favor, inicie sesión para realizar una reserva.');
-          return;
-      }
-
-      const reservationData = {
-          property_id: propertyId,
-          user_id: userId,
-          in_time: inTime,
-          out_time: outTime
-      };
-
-      try {
-          const response = await fetch('/reserve', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(reservationData)
-          });
-
-          const result = await response.json();
-
-          if (response.ok) {
-              alert('Reserva realizada con éxito. Proceda al pago.');
-              document.getElementById('reservation-form').classList.add('hidden');
-              document.getElementById('payment-form').classList.remove('hidden');
-          } else {
-              alert('Error al realizar la reserva: ' + (result.message || "Error desconocido"));
-          }
-      } catch (error) {
-          console.error('Error:', error);
-          alert('Error al realizar la reserva: ' + error.message);
-      }
-  });
-
-    // Simulación de pago
     document.getElementById('payment-details').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -119,9 +53,8 @@
       const cardExpiry = document.getElementById('card-expiry').value;
       const cardCvc = document.getElementById('card-cvc').value;
 
-      // Aquí podrías agregar la lógica para procesar el pago
       alert('Pago simulado con éxito. ¡Gracias por su reserva!');
-      window.location.href = "/paginas/page.html"; // Redirigir al inicio
+      window.location.href = "/paginas/page.html";
     });
   </script>
 </body>

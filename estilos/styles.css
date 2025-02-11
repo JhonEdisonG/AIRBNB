@@ -22,8 +22,8 @@ body {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 1%;  /* Ajusta este valor para definir desde dónde empieza la línea */
-  right: 1%; /* Ajusta este valor para definir dónde termina la línea */
+  left: 1%; 
+  right: 1%;
   border-bottom: 2px solid #000000;
 }
 
@@ -138,8 +138,8 @@ body {
   content: "";
   position: absolute;
   bottom: 0;
-  left: 1%;  /* Ajusta este valor para definir desde dónde empieza la línea */
-  right: 1%; /* Ajusta este valor para definir dónde termina la línea */
+  left: 1%;
+  right: 1%;
   border-bottom: 2px solid #000000;
   margin-bottom: -20px;
   margin-left: -20px;
@@ -149,8 +149,8 @@ body {
 .grid-container {
   display: grid;
   grid-template-columns: repeat(3, minmax(300px, 1fr));
-  gap: 20px; /* Espacio entre las tarjetas */
-  justify-items: center; /* Centra los items dentro de cada celda del grid */
+  gap: 20px;
+  justify-items: center; 
 }
 
 /* Tarjetas de propiedades */
@@ -164,18 +164,18 @@ body {
   overflow: hidden;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;  /* Asegura que las tarjetas tengan el mismo tamaño */
-  width: 100%;   /* Hace que las tarjetas ocupen el 100% del espacio disponible */
-  box-sizing: border-box; /* Para asegurar que el padding no afecte el tamaño total */
+  height: 100%;  
+  width: 100%;   
+  box-sizing: border-box; 
 }
 
 .card img {
-  width: 100%;  /* Hace que la imagen ocupe todo el ancho de la tarjeta */
+  width: 100%;  
   height: 400px; 
-  max-height: 300px; /* Limita la altura de las imágenes para que no se estiren excesivamente */
+  max-height: 300px; 
   border-radius: 8px;
   margin-bottom: 12px;
-  object-fit: cover; /* Asegura que la imagen se ajuste sin distorsionarse */
+  object-fit: cover;
 }
 
 .card h3 {
@@ -186,7 +186,7 @@ body {
 
 .card p {
   color: #6b7280;
-  flex-grow: 1; /* Hace que el texto ocupe el espacio disponible y no afecte el tamaño de la tarjeta */
+  flex-grow: 1; 
 }
 
 .reserve-btn {
