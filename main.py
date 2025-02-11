@@ -90,8 +90,11 @@ async def reserve(reservation: ReservationRequest):
             return JSONResponse(content={"message": "Usuario no encontrado"}, status_code=404)
 
         # Convertir las fechas de string a datetime
-        in_time = datetime.strptime(reservation.in_time, "%Y-%m-%d")
-        out_time = datetime.strptime(reservation.out_time, "%Y-%m-%d")
+        try:
+            in_time = datetime.strptime(reservation.in_time, "%Y-%m-%d")
+            out_time = datetime.strptime(reservation.out_time, "%Y-%m-%d")
+        except ValueError as e:
+            return JSONResponse(content={"message": "Formato de fecha inválido. Use YYYY-MM-DD"}, status_code=400)
 
         # Verificar que las fechas no sean anteriores al día actual
         if in_time < datetime.now() or out_time < datetime.now():
@@ -109,9 +112,16 @@ async def reserve(reservation: ReservationRequest):
             "in_time": in_time.isoformat(),
             "out_time": out_time.isoformat()
         }
+
+        # Debug: Imprimir los datos de reserva recibidos
+        print(f"Datos de reserva recibidos: {new_reservation}")
+
         response = supabase.table("Bookings").insert(new_reservation).execute()
 
-        if response.status_code != 201:
+        # Debug: Imprimir la respuesta de Supabase
+        print(f"Respuesta de Supabase: {response}")
+
+        if not response.data:
             return JSONResponse(content={"message": "Error al realizar la reserva", "details": str(response)}, status_code=500)
 
         return JSONResponse(content={"message": "Reserva realizada con éxito"}, status_code=201)

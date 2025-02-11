@@ -21,29 +21,34 @@
   <main class="content">
     <div class="property-details">
       <h2>Reservar Propiedad</h2>
-      <form id="reservation-form">
-        <label for="in-time">Fecha de Entrada:</label>
-        <input type="date" id="in-time" name="in-time" required>
-
-        <label for="out-time">Fecha de Salida:</label>
-        <input type="date" id="out-time" name="out-time" required>
-
+      <form id="reservation-form" class="reservation-form">
+        <div class="form-group">
+          <label for="in-time">Fecha de Entrada:</label>
+          <input type="date" id="in-time" name="in-time" required>
+        </div>
+        <div class="form-group">
+          <label for="out-time">Fecha de Salida:</label>
+          <input type="date" id="out-time" name="out-time" required>
+        </div>
         <button type="submit" class="reserve-btn">Reservar</button>
       </form>
 
       <!-- Formulario de pago simulado (oculto inicialmente) -->
-      <div id="payment-form" class="hidden">
+      <div id="payment-form" class="hidden payment-form">
         <h3>Simulación de Pago</h3>
-        <form id="payment-details">
-          <label for="card-number">Número de Tarjeta:</label>
-          <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
-
-          <label for="card-expiry">Fecha de Expiración:</label>
-          <input type="text" id="card-expiry" placeholder="MM/YY" required>
-
-          <label for="card-cvc">CVC:</label>
-          <input type="text" id="card-cvc" placeholder="123" required>
-
+        <form id="payment-details" class="payment-details">
+          <div class="form-group">
+            <label for="card-number">Número de Tarjeta:</label>
+            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
+          </div>
+          <div class="form-group">
+            <label for="card-expiry">Fecha de Expiración:</label>
+            <input type="text" id="card-expiry" placeholder="MM/YY" required>
+          </div>
+          <div class="form-group">
+            <label for="card-cvc">CVC:</label>
+            <input type="text" id="card-cvc" placeholder="123" required>
+          </div>
           <button type="submit" class="reserve-btn">Pagar</button>
         </form>
       </div>
@@ -73,38 +78,38 @@
       const userId = localStorage.getItem('userId');
 
       if (!userId) {
-        alert('Por favor, inicie sesión para realizar una reserva.');
-        return;
+          alert('Por favor, inicie sesión para realizar una reserva.');
+          return;
       }
 
       const reservationData = {
-        property_id: propertyId,
-        user_id: userId,
-        in_time: inTime,
-        out_time: outTime
+          property_id: propertyId,
+          user_id: userId,
+          in_time: inTime,
+          out_time: outTime
       };
 
       try {
-        const response = await fetch('/reserve', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(reservationData)
-        });
+          const response = await fetch('/reserve', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(reservationData)
+          });
 
-        const result = await response.json();
+          const result = await response.json();
 
-        if (response.ok) {
-          alert('Reserva realizada con éxito. Proceda al pago.');
-          document.getElementById('reservation-form').classList.add('hidden');
-          document.getElementById('payment-form').classList.remove('hidden');
-        } else {
-          alert('Error al realizar la reserva: ' + result.message);
-        }
+          if (response.ok) {
+              alert('Reserva realizada con éxito. Proceda al pago.');
+              document.getElementById('reservation-form').classList.add('hidden');
+              document.getElementById('payment-form').classList.remove('hidden');
+          } else {
+              alert('Error al realizar la reserva: ' + (result.message || "Error desconocido"));
+          }
       } catch (error) {
-        console.error('Error:', error);
-        alert('Error al realizar la reserva');
+          console.error('Error:', error);
+          alert('Error al realizar la reserva: ' + error.message);
       }
-    });
+  });
 
     // Simulación de pago
     document.getElementById('payment-details').addEventListener('submit', async (e) => {
