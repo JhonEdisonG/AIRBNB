@@ -35,6 +35,9 @@
             <label for="card-cvc">CVC:</label>
             <input type="text" id="card-cvc" placeholder="123" required>
           </div>
+          <div class="form-group">
+            <p id="subtotal">Subtotal: $0</p>
+          </div>
           <button type="submit" class="reserve-btn">Pagar</button>
         </form>
       </div>
@@ -46,29 +49,25 @@
   </footer>
 
   <script>
+    const reservationData = JSON.parse(localStorage.getItem('reservationData'));
+
+    if (reservationData) {
+      const subtotalElement = document.getElementById('subtotal');
+      subtotalElement.textContent = `Subtotal: $${reservationData.subtotal.toLocaleString()}`;
+    }
+
     document.getElementById('payment-details').addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Simulamos el pago
       const cardNumber = document.getElementById('card-number').value;
       const cardExpiry = document.getElementById('card-expiry').value;
       const cardCvc = document.getElementById('card-cvc').value;
 
-      // Validamos que los campos no estén vacíos
       if (!cardNumber || !cardExpiry || !cardCvc) {
           alert('Por favor, complete todos los campos de pago.');
           return;
       }
 
-      // Recuperamos los datos de la reserva desde localStorage
-      const reservationData = JSON.parse(localStorage.getItem('reservationData'));
-
-      if (!reservationData) {
-          alert('Error: No se encontraron datos de reserva.');
-          return;
-      }
-
-      // Hacemos la reserva después de simular el pago
       try {
           const response = await fetch('/reserve', {
               method: 'POST',

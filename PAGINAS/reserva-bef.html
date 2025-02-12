@@ -47,6 +47,14 @@
     document.getElementById('in-time').setAttribute('min', today);
     document.getElementById('out-time').setAttribute('min', today);
 
+    const propertyPrices = {
+      1: 450000, 
+      2: 500000, 
+      3: 320000,  
+      4: 800000,  
+      5: 50000   
+    };
+
     document.getElementById('reservation-form').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -60,16 +68,29 @@
           return;
       }
 
-      // Guardamos los datos de la reserva en localStorage para usarlos después del pago
+      const startDate = new Date(inTime);
+      const endDate = new Date(outTime);
+      const timeDiff = endDate - startDate;
+      const numDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+      if (numDays <= 0) {
+          alert('La fecha de salida debe ser posterior a la fecha de entrada.');
+          return;
+      }
+
+      const pricePerNight = propertyPrices[propertyId];
+
+      const subtotal = pricePerNight * numDays;
+
       const reservationData = {
           property_id: propertyId,
           user_id: userId,
           in_time: inTime,
-          out_time: outTime
+          out_time: outTime,
+          subtotal: subtotal
       };
       localStorage.setItem('reservationData', JSON.stringify(reservationData));
 
-      // Redirigimos a la página de pago
       window.location.href = `/paginas/reserva.html?id=${propertyId}`;
     });
   </script>
