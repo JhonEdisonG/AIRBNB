@@ -79,16 +79,12 @@ async def login(user: LoginRequest):
 @app.get("/reserved-dates/{property_id}")
 async def get_reserved_dates(property_id: int):
     try:
-        # Consultar las reservas para la propiedad específica
         response = supabase.table("Bookings").select("in_time, out_time").eq("property_id", property_id).execute()
-        
-        # Procesar las fechas reservadas
         reserved_dates = []
         for booking in response.data:
             in_time = datetime.fromisoformat(booking["in_time"])
             out_time = datetime.fromisoformat(booking["out_time"])
             
-            # Generar un rango de fechas entre in_time y out_time
             current_date = in_time
             while current_date <= out_time:
                 reserved_dates.append(current_date.strftime("%Y-%m-%d"))
