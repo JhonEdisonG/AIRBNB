@@ -6,6 +6,7 @@
   <title>Reservar Propiedad</title>
   <link rel="stylesheet" href="/estilos/styles.css">
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2111/2111320.png" type="image/jpeg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body class="bg-gray-100">
   <header class="header">
@@ -39,13 +40,37 @@
     <p>&copy; 2025 AIRBNB JH-LS. Todos los derechos reservados.</p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
     const propertyId = params.get('id');
 
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('in-time').setAttribute('min', today);
-    document.getElementById('out-time').setAttribute('min', today);
+    async function getReservedDates(propertyId) {
+      try {
+        const response = await fetch(`/reserved-dates/${propertyId}`);
+        const data = await response.json();
+        return data.reserved_dates; // Array de fechas reservadas en formato YYYY-MM-DD
+      } catch (error) {
+        console.error('Error al obtener las fechas reservadas:', error);
+        return [];
+      }
+    }
+
+    async function setupDatePickers(propertyId) {
+      const blockedDates = await getReservedDates(propertyId);
+
+      flatpickr("#in-time", {
+        minDate: "today",
+        disable: blockedDates,
+      });
+
+      flatpickr("#out-time", {
+        minDate: "today",
+        disable: blockedDates,
+      });
+    }
+
+    setupDatePickers(propertyId);
 
     const propertyPrices = {
       1: 450000, 
@@ -61,6 +86,21 @@
       const inTime = document.getElementById('in-time').value;
       const outTime = document.getElementById('out-time').value;
 
+      const blockedDates = await getReservedDates(propertyId);
+
+      const startDate = new Date(inTime);
+      const endDate = new Date(outTime);
+      let currentDate = startDate;
+
+      while (currentDate <= endDate) {
+        const formattedDate = currentDate.toISOString().split('T')[0];
+        if (blockedDates.includes(formattedDate)) {
+          alert('Una o más fechas seleccionadas no están disponibles. Por favor, elige otras.');
+          return;
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
       const userId = localStorage.getItem('userId');
 
       if (!userId) {
@@ -68,9 +108,9 @@
           return;
       }
 
-      const startDate = new Date(inTime);
-      const endDate = new Date(outTime);
-      const timeDiff = endDate - startDate;
+      const startDateObj = new Date(inTime);
+      const endDateObj = new Date(outTime);
+      const timeDiff = endDateObj - startDateObj;
       const numDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
       if (numDays <= 0) {
@@ -79,7 +119,7 @@
       }
 
       const pricePerNight = propertyPrices[propertyId];
-
+      
       const subtotal = pricePerNight * numDays;
 
       const reservationData = {

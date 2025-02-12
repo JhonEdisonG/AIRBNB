@@ -1,4 +1,4 @@
-#python -m uvicorn main:app --reload
+# python -m uvicorn main:app --reload
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from supabase import create_client, Client
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 load_dotenv()
 app = FastAPI()
@@ -76,6 +76,29 @@ async def login(user: LoginRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/reserved-dates/{property_id}")
+async def get_reserved_dates(property_id: int):
+    try:
+        # Consultar las reservas para la propiedad específica
+        response = supabase.table("Bookings").select("in_time, out_time").eq("property_id", property_id).execute()
+        
+        # Procesar las fechas reservadas
+        reserved_dates = []
+        for booking in response.data:
+            in_time = datetime.fromisoformat(booking["in_time"])
+            out_time = datetime.fromisoformat(booking["out_time"])
+            
+            # Generar un rango de fechas entre in_time y out_time
+            current_date = in_time
+            while current_date <= out_time:
+                reserved_dates.append(current_date.strftime("%Y-%m-%d"))
+                current_date += timedelta(days=1)
+        
+        return JSONResponse(content={"reserved_dates": reserved_dates}, status_code=200)
+    except Exception as e:
+        print(f"Error al obtener las fechas reservadas: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/reserve")
 async def reserve(reservation: ReservationRequest):
     try:
@@ -103,14 +126,7 @@ async def reserve(reservation: ReservationRequest):
             "out_time": out_time.isoformat()
         }
 
-        #Hasheo
-        print(f"Datos de reserva recibidos: {new_reservation}")
-
         response = supabase.table("Bookings").insert(new_reservation).execute()
-        
-        #Hasheo
-        print(f"Respuesta de Supabase: {response}")
-
         if not response.data:
             return JSONResponse(content={"message": "Error al realizar la reserva", "details": str(response)}, status_code=500)
 

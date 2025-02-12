@@ -36,6 +36,7 @@
             <input type="text" id="card-cvc" placeholder="123" required>
           </div>
           <div class="form-group">
+            <p id="reservation-details">Detalles de la reserva:</p>
             <p id="subtotal">Subtotal: $0</p>
           </div>
           <button type="submit" class="reserve-btn">Pagar</button>
@@ -52,10 +53,15 @@
     const reservationData = JSON.parse(localStorage.getItem('reservationData'));
 
     if (reservationData) {
+      const reservationDetails = document.getElementById('reservation-details');
       const subtotalElement = document.getElementById('subtotal');
-      subtotalElement.textContent = `Subtotal: $${reservationData.subtotal.toLocaleString()}`;
-    }
 
+      reservationDetails.textContent = `Reserva para la propiedad ${reservationData.property_id} del ${reservationData.in_time} al ${reservationData.out_time}.`;
+      subtotalElement.textContent = `Subtotal: $${reservationData.subtotal.toLocaleString()}`;
+    } else {
+      alert('No se encontraron datos de reserva. Por favor, vuelva a la página de reserva.');
+      window.location.href = "/paginas/page.html";
+    }
     document.getElementById('payment-details').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -69,17 +75,36 @@
       }
 
       try {
-          const response = await fetch('/reserve', {
+          const response = await fetch(`/reserved-dates/${reservationData.property_id}`);
+          const data = await response.json();
+          const blockedDates = data.reserved_dates;
+
+          const startDate = new Date(reservationData.in_time);
+          const endDate = new Date(reservationData.out_time);
+          let currentDate = startDate;
+
+          while (currentDate <= endDate) {
+            const formattedDate = currentDate.toISOString().split('T')[0];
+            if (blockedDates.includes(formattedDate)) {
+              alert('Una o más fechas seleccionadas ya no están disponibles. Por favor, elige otras.');
+              window.location.href = `/paginas/reserva.html?id=${reservationData.property_id}`;
+              return;
+            }
+            currentDate.setDate(currentDate.getDate() + 1);
+          }
+
+          const reserveResponse = await fetch('/reserve', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(reservationData)
           });
 
-          const result = await response.json();
+          const result = await reserveResponse.json();
 
-          if (response.ok) {
+          if (reserveResponse.ok) {
               alert('Pago simulado con éxito. Reserva realizada.');
-              window.location.href = "/paginas/page.html"; // Redirigimos al inicio
+              localStorage.removeItem('reservationData');
+              window.location.href = "/paginas/page.html";
           } else {
               alert('Error al realizar la reserva: ' + (result.message || "Error desconocido"));
           }
