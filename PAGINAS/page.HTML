@@ -20,6 +20,7 @@
         <ul class="nav-links">
             <li><a href="#" id="register-link">Registrarse</a></li>
             <li><a href="#" id="login-link">Iniciar Sesión</a></li>
+            <li><a href="#" id="logout-link" class="hidden">Cerrar Sesión</a></li>
         </ul>
     </nav>
   </header>
@@ -51,6 +52,7 @@
         <p id="login-message"></p>
       </div>
     </div>
+
     <div id="map" class="map-container"></div>
     <section>
       <h2 class="section-title">Propiedades Disponibles</h2>
@@ -99,11 +101,84 @@
     </section>
   </main>
 
+
   <footer class="footer">
     <p>&copy; 2025 AIRBNB JH-LS. Todos los derechos reservados.</p>
   </footer>
 
   <script>
+    function updateMenu() {
+      const userId = localStorage.getItem('userId');
+      const registerLink = document.getElementById('register-link');
+      const loginLink = document.getElementById('login-link');
+      const logoutLink = document.getElementById('logout-link');
+
+      if (userId) {
+        registerLink.classList.add('hidden');
+        loginLink.classList.add('hidden');
+        logoutLink.classList.remove('hidden');
+      } else {
+        registerLink.classList.remove('hidden');
+        loginLink.classList.remove('hidden');
+        logoutLink.classList.add('hidden');
+      }
+    }
+
+    updateMenu();
+
+    document.getElementById('logout-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('userId'); 
+      updateMenu(); 
+      alert('Sesión cerrada con éxito.');
+      window.location.href = "/paginas/page.html"; 
+    });
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('register-name').value;
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+
+      const response = await fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        localStorage.setItem('userId', result.user_id); 
+        updateMenu(); 
+        document.getElementById('register-message').textContent = "Usuario registrado con éxito";
+        window.location.href = "/paginas/page.html"; 
+      } else {
+        document.getElementById('register-message').textContent = result.message;
+      }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        localStorage.setItem('userId', result.user_id); 
+        updateMenu(); 
+        document.getElementById('login-message').textContent = "Inicio de sesión exitoso";
+        window.location.href = "/paginas/page.html"; 
+      } else {
+        document.getElementById('login-message').textContent = result.message;
+      }
+    });
+
     const registerLink = document.getElementById('register-link');
     const loginLink = document.getElementById('login-link');
     const registerModal = document.getElementById('register-modal');
@@ -111,58 +186,21 @@
     const closeButtons = document.querySelectorAll('.close');
 
     registerLink.addEventListener('click', () => {
-        registerModal.classList.remove('hidden');
+      registerModal.classList.remove('hidden');
     });
 
     loginLink.addEventListener('click', () => {
-        loginModal.classList.remove('hidden');
+      loginModal.classList.remove('hidden');
     });
 
     closeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            registerModal.classList.add('hidden');
-            loginModal.classList.add('hidden');
-        });
-    });
-
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('register-name').value;
-        const email = document.getElementById('register-email').value;
-        const password = document.getElementById('register-password').value;
-
-        const response = await fetch('/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password })
-        });
-
-        const result = await response.json();
-        document.getElementById('register-message').textContent = result.message;
-    });
-
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            localStorage.setItem('userId', result.user_id);
-            document.getElementById('login-message').textContent = "Inicio de sesión exitoso";
-            window.location.href = "/paginas/page.html";
-        } else {
-            document.getElementById('login-message').textContent = result.message;
-        }
+      button.addEventListener('click', () => {
+        registerModal.classList.add('hidden');
+        loginModal.classList.add('hidden');
+      });
     });
   </script>
-  
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     var map = L.map('map').setView([4.5709, -74.2973], 6);
