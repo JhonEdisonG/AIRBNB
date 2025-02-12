@@ -49,12 +49,45 @@
     document.getElementById('payment-details').addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      // Simulamos el pago
       const cardNumber = document.getElementById('card-number').value;
       const cardExpiry = document.getElementById('card-expiry').value;
       const cardCvc = document.getElementById('card-cvc').value;
 
-      alert('Pago simulado con éxito. ¡Gracias por su reserva!');
-      window.location.href = "/paginas/page.html";
+      // Validamos que los campos no estén vacíos
+      if (!cardNumber || !cardExpiry || !cardCvc) {
+          alert('Por favor, complete todos los campos de pago.');
+          return;
+      }
+
+      // Recuperamos los datos de la reserva desde localStorage
+      const reservationData = JSON.parse(localStorage.getItem('reservationData'));
+
+      if (!reservationData) {
+          alert('Error: No se encontraron datos de reserva.');
+          return;
+      }
+
+      // Hacemos la reserva después de simular el pago
+      try {
+          const response = await fetch('/reserve', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(reservationData)
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+              alert('Pago simulado con éxito. Reserva realizada.');
+              window.location.href = "/paginas/page.html"; // Redirigimos al inicio
+          } else {
+              alert('Error al realizar la reserva: ' + (result.message || "Error desconocido"));
+          }
+      } catch (error) {
+          console.error('Error:', error);
+          alert('Error al realizar la reserva: ' + error.message);
+      }
     });
   </script>
 </body>

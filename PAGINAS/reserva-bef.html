@@ -30,7 +30,7 @@
           <label for="out-time">Fecha de Salida:</label>
           <input type="date" id="out-time" name="out-time" required>
         </div>
-        <button type="submit" class="reserve-btn" onclick="window.location.href='reserva.html'">Reservar</button>
+        <button type="submit" class="reserve-btn">Reservar</button>
       </form>
     </div>
   </main>
@@ -60,34 +60,18 @@
           return;
       }
 
+      // Guardamos los datos de la reserva en localStorage para usarlos después del pago
       const reservationData = {
           property_id: propertyId,
           user_id: userId,
           in_time: inTime,
           out_time: outTime
       };
+      localStorage.setItem('reservationData', JSON.stringify(reservationData));
 
-      try {
-          const response = await fetch('/reserve', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(reservationData)
-          });
-
-          const result = await response.json();
-
-          if (response.ok) {
-              alert('Reserva realizada con éxito. Proceda al pago.');
-              document.getElementById('reservation-form').classList.add('hidden');
-              document.getElementById('payment-form').classList.remove('hidden');
-          } else {
-              alert('Error al realizar la reserva: ' + (result.message || "Error desconocido"));
-          }
-      } catch (error) {
-          console.error('Error:', error);
-          alert('Error al realizar la reserva: ' + error.message);
-      }
-  });
+      // Redirigimos a la página de pago
+      window.location.href = `/paginas/reserva.html?id=${propertyId}`;
+    });
   </script>
 </body>
 </html>
