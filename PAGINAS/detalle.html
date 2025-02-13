@@ -27,7 +27,6 @@
       <p id="property-address"></p>
       <p id="property-rating"></p>
       <ul id="property-amenities"></ul>
-      <a id="directions-btn" href="#" target="_blank" class="directions-btn">Cómo llegar</a>
       <a id="reserve-btn" href="reserva-bef.html" class="directions-btn">Reservar</a>
     </div>
 
@@ -111,9 +110,6 @@
       li.textContent = amenity;
       amenitiesList.appendChild(li);
     });
-
-    const directionsBtn = document.getElementById('directions-btn');
-    directionsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${property.coordinates[0]},${property.coordinates[1]}`;
 
     const reserveBtn = document.getElementById('reserve-btn');
     reserveBtn.href = `/paginas/reserva-bef.html?id=${propertyId}`;

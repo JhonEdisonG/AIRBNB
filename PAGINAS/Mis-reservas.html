@@ -21,15 +21,37 @@
   <main class="content">
     <h2 class="section-title">Mis Reservas Activas</h2>
     <div id="reservations-container" class="grid-container">
-      <!-- Aquí se cargarán las reservas activas -->
     </div>
   </main>
 
   <footer class="footer">
     <p>&copy; 2025 AIRBNB JH-LS. Todos los derechos reservados.</p>
   </footer>
-
+    
   <script>
+    const properties = {
+      1: {
+        img: 'https://images.ctfassets.net/8lc7xdlkm4kt/33L5l2aTXdJAAEfw55n0Yh/7472faf6b498fdc11091fc65a5c69165/render-sobre-planos-saint-michel.jpg',
+        coordinates: [6.2088, -75.5679],
+      },
+      2: {
+        img: 'https://media-luna-hostel.cartagena-hotels.net/data/Photos/1080x700w/10392/1039228/1039228984/cartagena-media-luna-hostel-photo-1.JPEG',
+        coordinates: [10.422385, -75.544984],
+      },
+      3: {
+        img: 'https://latinexclusive.com/sites/default/files/styles/main_property_slide/public/api_file_downloads/3862061_1.jpg?itok=qxmdZ3oA',
+        coordinates: [4.711, -74.0721],
+      },
+      4: {
+        img: 'https://asoaturquindio.com/wp-content/uploads/2023/09/cabanas-la-herradura-4-1.jpg',
+        coordinates: [4.845385, -75.582560],
+      },
+      5: {
+        img: 'https://cf.bstatic.com/xdata/images/hotel/max500/151251581.jpg?k=02b942afead8be7bea67cd35453662d8a6ae787336565b884c55aca6dbedcd08&o=',
+        coordinates: [11.244911, -74.211768],
+      }
+    };
+
     const userId = localStorage.getItem('userId');
 
     if (!userId) {
@@ -38,50 +60,54 @@
     }
 
     async function fetchActiveReservations(userId) {
-    try {
-        const response = await fetch(`/active-reservations/${userId}`);
-        const data = await response.json();
-        return data.reservations; // Array de reservas activas
-    } catch (error) {
-        console.error('Error al obtener las reservas:', error);
-        return [];
-    }
-}
-
-async function fetchActiveReservations(userId) {
-    try {
-        const response = await fetch(`/active-reservations/${userId}`);
-        const data = await response.json();
-        return data.reservations; // Array de reservas activas
-    } catch (error) {
-        console.error('Error al obtener las reservas:', error);
-        return [];
-    }
-}
-
-async function loadReservations() {
-    const reservations = await fetchActiveReservations(userId);
-    const reservationsContainer = document.getElementById('reservations-container');
-
-    if (reservations.length === 0) {
-        reservationsContainer.innerHTML = '<p>No tienes reservas activas.</p>';
-        return;
+      try {
+          const response = await fetch(`/active-reservations/${userId}`);
+          const data = await response.json();
+          return data.reservations;
+      } catch (error) {
+          console.error('Error al obtener las reservas:', error);
+          return [];
+      }
     }
 
-    reservations.forEach(reservation => {
-        const card = document.createElement('div');
-        card.classList.add('card');
+    async function loadReservations() {
+      const reservations = await fetchActiveReservations(userId);
+      const reservationsContainer = document.getElementById('reservations-container');
 
-        card.innerHTML = `
-            <h3>${reservation.property_name}</h3>
-            <p>Fecha de entrada: ${reservation.in_time}</p>
-            <p>Fecha de salida: ${reservation.out_time}</p>
-            <p>Estado: ${reservation.status}</p>
-        `;
+      if (reservations.length === 0) {
+          reservationsContainer.innerHTML = '<p>No tienes reservas activas.</p>';
+          return;
+      }
 
-        reservationsContainer.appendChild(card);
-    });
-}
+      reservations.forEach(reservation => {
+          const propertyInfo = properties[reservation.property_id] || {
+              img: 'URL_imagen_por_defecto',
+              coordinates: [0, 0],
+              amenities: []
+          };
+
+          const card = document.createElement('div');
+          card.classList.add('card');
+
+          card.innerHTML = `
+              <img src="${propertyInfo.img}" alt="${reservation.property_name}">
+              <h3>${reservation.property_name}</h3>
+              <p>Fecha de entrada: ${reservation.in_time}</p>
+              <p>Fecha de salida: ${reservation.out_time}</p>
+              <p>Estado: ${reservation.status}</p>
+              ${propertyInfo.amenities ? 
+                `<ul>${propertyInfo.amenities.map(amenity => `<li>${amenity}</li>`).join('')}</ul>` 
+                : ''}
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${propertyInfo.coordinates[0]},${propertyInfo.coordinates[1]}" 
+                 target="_blank" 
+                 class="directions-btn">
+                  Cómo llegar
+              </a>
+          `;
+
+          reservationsContainer.appendChild(card);
+      });
+    }
 
     loadReservations();
   </script>
