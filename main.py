@@ -137,14 +137,9 @@ async def reserve(reservation: ReservationRequest):
 @app.get("/active-reservations/{user_id}")
 async def get_active_reservations(user_id: int):
     try:
-        now = datetime.utcnow().isoformat()
-        reservations = (
-            supabase.table("Bookings")
-            .select("*")
-            .eq("user_id", user_id)
-            .gte("out_time", now)
-            .execute()
-        )
+        now = datetime.now().isoformat()
+        reservations = supabase.table("Bookings").select("*").eq("user_id", user_id).gte("out_time", now).execute()
+
 
         if not reservations.data:
             return JSONResponse(content={"reservations": []}, status_code=200)
@@ -169,7 +164,6 @@ async def get_active_reservations(user_id: int):
                 })
 
         return JSONResponse(content={"reservations": active_reservations}, status_code=200)
-
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
     
