@@ -84,19 +84,22 @@
           let currentDate = startDate;
 
           while (currentDate <= endDate) {
-            const formattedDate = currentDate.toISOString().split('T')[0];
-            if (blockedDates.includes(formattedDate)) {
-              alert('Una o más fechas seleccionadas ya no están disponibles. Por favor, elige otras.');
-              window.location.href = `/paginas/reserva.html?id=${reservationData.property_id}`;
-              return;
-            }
-            currentDate.setDate(currentDate.getDate() + 1);
+              const formattedDate = currentDate.toISOString().split('T')[0];
+              if (blockedDates.includes(formattedDate)) {
+                  alert('Una o más fechas seleccionadas ya no están disponibles. Por favor, elige otras.');
+                  window.location.href = `/paginas/reserva.html?id=${reservationData.property_id}`;
+                  return;
+              }
+              currentDate.setDate(currentDate.getDate() + 1);
           }
 
           const reserveResponse = await fetch('/reserve', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(reservationData)
+              body: JSON.stringify({
+                  ...reservationData,
+                  status: "activo"  // Asegúrate de incluir el estado activo
+              })
           });
 
           const result = await reserveResponse.json();
@@ -112,7 +115,7 @@
           console.error('Error:', error);
           alert('Error al realizar la reserva: ' + error.message);
       }
-    });
+  });
   </script>
 </body>
 </html>

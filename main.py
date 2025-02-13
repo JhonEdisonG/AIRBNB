@@ -119,7 +119,8 @@ async def reserve(reservation: ReservationRequest):
             "property_id": reservation.property_id,
             "user_id": reservation.user_id,
             "in_time": in_time.isoformat(),
-            "out_time": out_time.isoformat()
+            "out_time": out_time.isoformat(),
+            "status": "activo"  
         }
 
         response = supabase.table("Bookings").insert(new_reservation).execute()
@@ -130,3 +131,48 @@ async def reserve(reservation: ReservationRequest):
     except Exception as e:
         print(f"Error al realizar la reserva: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al realizar la reserva: {str(e)}")
+    
+
+@app.get("/active-reservations/{user_id}")
+async def get_active_reservations(user_id: int):
+    try:
+        # Obtener las reservas activas del usuario
+        reservations = supabase.table("Bookings").select("*").eq("user_id", user_id).gte("out_time", datetime.now().isoformat()).execute()
+        print("Reservas obtenidas de la base de datos:", reservations.data)  # Verifica las reservas obtenidas
+
+        if not reservations.data:
+            return JSONResponse(content={"reservations": []}, status_code=200)
+
+        # Obtener los detalles de las propiedades reservadas
+        active_reservations = []
+        for reservation in reservations.data:
+            property_details = supabase.table("Properties").select("*").eq("id", reservation["property_id"]).execute()
+            if property_details.data:
+                property = property_details.data[0]
+                active_reservations.append({
+                    "property_id": reservation["property_id"],
+                    "property_title": property["title"],
+                    "property_price": property["price"],
+                    "property_img": property["img"],
+                    "property_coordinates": property["coordinates"],
+                    "in_time": reservation["in_time"],
+                    "out_time": reservation["out_time"],
+                    "status": reservation["status"]  
+                })
+
+        return JSONResponse(content={"reservations": active_reservations}, status_code=200)
+    except Exception as e:
+        print(f"Error al obtener las reservas activas: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener las reservas activas: {str(e)}")
+    
+
+@app.put("/reservations/{reservation_id}/complete")
+async def complete_reservation(reservation_id: int):
+    try:
+        response = supabase.table("Bookings").update({"status": "terminado"}).eq("id", reservation_id).execute()
+        if not response.data:
+            return JSONResponse(content={"message": "Error al actualizar la reserva"}, status_code=500)
+        return JSONResponse(content={"message": "Reserva completada con éxito"}, status_code=200)
+    except Exception as e:
+        print(f"Error al completar la reserva: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al completar la reserva: {str(e)}")

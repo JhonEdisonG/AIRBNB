@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Reservas</title>
+  <link rel="stylesheet" href="/estilos/styles.css">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2111/2111320.png" type="image/jpeg">
+</head>
+<body class="bg-gray-100">
+  <header class="header">
+    <h1 class="logo">
+      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111320.png" alt="Logo">
+      AIRBNB JH-LS
+    </h1>
+    <nav>
+      <a href="/paginas/page.html" class="back-btn">← Volver al Inicio</a>
+    </nav>
+  </header>
+
+  <main class="content">
+    <h2 class="section-title">Mis Reservas Activas</h2>
+    <div id="reservations-container" class="grid-container">
+      <!-- Aquí se cargarán las reservas activas -->
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2025 AIRBNB JH-LS. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+      alert('Por favor, inicie sesión para ver sus reservas.');
+      window.location.href = "/paginas/page.html";
+    }
+
+    async function fetchActiveReservations(userId) {
+      try {
+        const response = await fetch(`/active-reservations/${userId}`);
+        const data = await response.json();
+        return data.reservations; // Array de reservas activas
+      } catch (error) {
+        console.error('Error al obtener las reservas:', error);
+        return [];
+      }
+    }
+
+    async function fetchActiveReservations(userId) {
+    try {
+        const response = await fetch(`/active-reservations/${userId}`);
+        const data = await response.json();
+        return data.reservations; // Array de reservas activas
+    } catch (error) {
+        console.error('Error al obtener las reservas:', error);
+        return [];
+    }
+}
+
+    async function loadReservations() {
+        const reservations = await fetchActiveReservations(userId);
+        const reservationsContainer = document.getElementById('reservations-container');
+
+        if (reservations.length === 0) {
+            reservationsContainer.innerHTML = '<p>No tienes reservas activas.</p>';
+            return;
+        }
+
+        reservations.forEach(reservation => {
+            const card = document.createElement('div');
+            card.classList.add('card');
+
+            card.innerHTML = `
+                <img src="${reservation.property_img}" alt="${reservation.property_title}">
+                <h3>${reservation.property_title}</h3>
+                <p>${reservation.property_price}</p>
+                <p>Estado: ${reservation.status}</p>
+                <br>
+                <a id="directions-btn" href="https://www.google.com/maps/dir/?api=1&destination=${reservation.property_coordinates[0]},${reservation.property_coordinates[1]}" target="_blank" class="directions-btn">Cómo llegar</a>
+            `;
+
+            reservationsContainer.appendChild(card);
+        });
+    }
+
+    loadReservations();
+  </script>
+</body>
+</html>

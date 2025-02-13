@@ -20,6 +20,7 @@
         <ul class="nav-links">
             <li><a href="#" id="register-link">Registrarse</a></li>
             <li><a href="#" id="login-link">Iniciar Sesión</a></li>
+            <li><a href="/paginas/mis-reservas.html" id="my-reservations-link" class="hidden">Mis Reservas</a></li>
             <li><a href="#" id="logout-link" class="hidden">Cerrar Sesión</a></li>
         </ul>
     </nav>
@@ -112,17 +113,21 @@
       const registerLink = document.getElementById('register-link');
       const loginLink = document.getElementById('login-link');
       const logoutLink = document.getElementById('logout-link');
+      const myReservationsLink = document.getElementById('my-reservations-link');
 
       if (userId) {
         registerLink.classList.add('hidden');
         loginLink.classList.add('hidden');
         logoutLink.classList.remove('hidden');
+        myReservationsLink.classList.remove('hidden');
       } else {
         registerLink.classList.remove('hidden');
         loginLink.classList.remove('hidden');
         logoutLink.classList.add('hidden');
+        myReservationsLink.classList.add('hidden');
       }
     }
+    
 
     updateMenu();
 
