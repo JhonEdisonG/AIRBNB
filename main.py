@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi import BackgroundTasks
 from supabase import create_client, Client
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -137,8 +138,8 @@ async def reserve(reservation: ReservationRequest):
 async def get_active_reservations(user_id: int):
     try:
         # Obtener las reservas activas del usuario
-        reservations = supabase.table("Bookings").select("*").eq("user_id", user_id).gte("out_time", datetime.now().isoformat()).execute()
-        print("Reservas obtenidas de la base de datos:", reservations.data)  # Verifica las reservas obtenidas
+        now = datetime.now().isoformat()
+        reservations = supabase.table("Bookings").select("*").eq("user_id", user_id).gte("out_time", now).execute()
 
         if not reservations.data:
             return JSONResponse(content={"reservations": []}, status_code=200)
@@ -157,7 +158,7 @@ async def get_active_reservations(user_id: int):
                     "property_coordinates": property["coordinates"],
                     "in_time": reservation["in_time"],
                     "out_time": reservation["out_time"],
-                    "status": reservation["status"]  
+                    "status": reservation["status"]
                 })
 
         return JSONResponse(content={"reservations": active_reservations}, status_code=200)
@@ -166,13 +167,20 @@ async def get_active_reservations(user_id: int):
         raise HTTPException(status_code=500, detail=f"Error al obtener las reservas activas: {str(e)}")
     
 
-@app.put("/reservations/{reservation_id}/complete")
-async def complete_reservation(reservation_id: int):
+async def update_expired_reservations():
     try:
-        response = supabase.table("Bookings").update({"status": "terminado"}).eq("id", reservation_id).execute()
-        if not response.data:
-            return JSONResponse(content={"message": "Error al actualizar la reserva"}, status_code=500)
-        return JSONResponse(content={"message": "Reserva completada con éxito"}, status_code=200)
+        # Obtener todas las reservas que están activas y cuya fecha de salida ha pasado
+        now = datetime.now().isoformat()
+        expired_reservations = supabase.table("Bookings").select("*").eq("status", "activo").lt("out_time", now).execute()
+
+        # Actualizar el estado de las reservas caducadas a "terminado"
+        for reservation in expired_reservations.data:
+            supabase.table("Bookings").update({"status": "terminado"}).eq("id", reservation["id"]).execute()
+
     except Exception as e:
-        print(f"Error al completar la reserva: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error al completar la reserva: {str(e)}")
+        print(f"Error al actualizar las reservas caducadas: {str(e)}")
+
+@app.get("/update-reservations")
+async def trigger_update_reservations(background_tasks: BackgroundTasks):
+    background_tasks.add_task(update_expired_reservations)
+    return {"message": "Actualización de reservas caducadas iniciada"}
