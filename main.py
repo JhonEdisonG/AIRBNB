@@ -137,43 +137,48 @@ async def reserve(reservation: ReservationRequest):
 @app.get("/active-reservations/{user_id}")
 async def get_active_reservations(user_id: int):
     try:
-        # Obtener las reservas activas del usuario
-        now = datetime.now().isoformat()
-        reservations = supabase.table("Bookings").select("*").eq("user_id", user_id).gte("out_time", now).execute()
+        now = datetime.utcnow().isoformat()
+        reservations = (
+            supabase.table("Bookings")
+            .select("*")
+            .eq("user_id", user_id)
+            .gte("out_time", now)
+            .execute()
+        )
 
         if not reservations.data:
             return JSONResponse(content={"reservations": []}, status_code=200)
 
-        # Obtener los detalles de las propiedades reservadas
         active_reservations = []
         for reservation in reservations.data:
-            property_details = supabase.table("Properties").select("*").eq("id", reservation["property_id"]).execute()
+            property_details = (
+                supabase.table("Property")
+                .select("id, name")
+                .eq("id", reservation["property_id"])
+                .execute()
+            )
+
             if property_details.data:
                 property = property_details.data[0]
                 active_reservations.append({
                     "property_id": reservation["property_id"],
-                    "property_title": property["title"],
-                    "property_price": property["price"],
-                    "property_img": property["img"],
-                    "property_coordinates": property["coordinates"],
+                    "property_name": property["name"],
                     "in_time": reservation["in_time"],
                     "out_time": reservation["out_time"],
                     "status": reservation["status"]
                 })
 
         return JSONResponse(content={"reservations": active_reservations}, status_code=200)
+
     except Exception as e:
-        print(f"Error al obtener las reservas activas: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error al obtener las reservas activas: {str(e)}")
+        return JSONResponse(content={"error": str(e)}, status_code=500)
     
 
 async def update_expired_reservations():
     try:
-        # Obtener todas las reservas que están activas y cuya fecha de salida ha pasado
         now = datetime.now().isoformat()
         expired_reservations = supabase.table("Bookings").select("*").eq("status", "activo").lt("out_time", now).execute()
 
-        # Actualizar el estado de las reservas caducadas a "terminado"
         for reservation in expired_reservations.data:
             supabase.table("Bookings").update({"status": "terminado"}).eq("id", reservation["id"]).execute()
 

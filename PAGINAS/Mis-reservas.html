@@ -38,17 +38,6 @@
     }
 
     async function fetchActiveReservations(userId) {
-      try {
-        const response = await fetch(`/active-reservations/${userId}`);
-        const data = await response.json();
-        return data.reservations; // Array de reservas activas
-      } catch (error) {
-        console.error('Error al obtener las reservas:', error);
-        return [];
-      }
-    }
-
-    async function fetchActiveReservations(userId) {
     try {
         const response = await fetch(`/active-reservations/${userId}`);
         const data = await response.json();
@@ -59,31 +48,40 @@
     }
 }
 
-    async function loadReservations() {
-        const reservations = await fetchActiveReservations(userId);
-        const reservationsContainer = document.getElementById('reservations-container');
-
-        if (reservations.length === 0) {
-            reservationsContainer.innerHTML = '<p>No tienes reservas activas.</p>';
-            return;
-        }
-
-        reservations.forEach(reservation => {
-            const card = document.createElement('div');
-            card.classList.add('card');
-
-            card.innerHTML = `
-                <img src="${reservation.property_img}" alt="${reservation.property_title}">
-                <h3>${reservation.property_title}</h3>
-                <p>${reservation.property_price}</p>
-                <p>Estado: ${reservation.status}</p>
-                <br>
-                <a id="directions-btn" href="https://www.google.com/maps/dir/?api=1&destination=${reservation.property_coordinates[0]},${reservation.property_coordinates[1]}" target="_blank" class="directions-btn">Cómo llegar</a>
-            `;
-
-            reservationsContainer.appendChild(card);
-        });
+async function fetchActiveReservations(userId) {
+    try {
+        const response = await fetch(`/active-reservations/${userId}`);
+        const data = await response.json();
+        return data.reservations; // Array de reservas activas
+    } catch (error) {
+        console.error('Error al obtener las reservas:', error);
+        return [];
     }
+}
+
+async function loadReservations() {
+    const reservations = await fetchActiveReservations(userId);
+    const reservationsContainer = document.getElementById('reservations-container');
+
+    if (reservations.length === 0) {
+        reservationsContainer.innerHTML = '<p>No tienes reservas activas.</p>';
+        return;
+    }
+
+    reservations.forEach(reservation => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+
+        card.innerHTML = `
+            <h3>${reservation.property_name}</h3>
+            <p>Fecha de entrada: ${reservation.in_time}</p>
+            <p>Fecha de salida: ${reservation.out_time}</p>
+            <p>Estado: ${reservation.status}</p>
+        `;
+
+        reservationsContainer.appendChild(card);
+    });
+}
 
     loadReservations();
   </script>
