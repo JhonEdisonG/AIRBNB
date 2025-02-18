@@ -99,13 +99,24 @@
                 `<ul>${propertyInfo.amenities.map(amenity => `<li>${amenity}</li>`).join('')}</ul>` 
                 : ''}
               <a href="https://www.google.com/maps/dir/?api=1&destination=${propertyInfo.coordinates[0]},${propertyInfo.coordinates[1]}" 
-                 target="_blank" 
-                 class="directions-btn">
-                  Cómo llegar
+                target="_blank" 
+                class="directions-btn">
+                Cómo llegar
               </a>
+              <button class="directions-btn" data-booking-id="${reservation.id}" data-property-id="${reservation.property_id}">
+              Dejar Feedback
+              </button>
           `;
 
           reservationsContainer.appendChild(card);
+      });
+
+      document.querySelectorAll('.directions-btn').forEach(button => {
+          button.addEventListener('click', (e) => {
+              const bookingId = e.target.getAttribute('data-booking-id');
+              const propertyId = e.target.getAttribute('data-property-id');
+              window.location.href = `/paginas/feedback.html?booking_id=${bookingId}&property_id=${propertyId}`;
+          });
       });
     }
 

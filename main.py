@@ -32,6 +32,12 @@ class RegisterRequest(BaseModel):
     email: str
     password: str
 
+class FeedbackRequest(BaseModel):
+    id_booking: int
+    id_property: int
+    comments: str
+    rating: int
+    
 class LoginRequest(BaseModel):
     email: str
     password: str
@@ -138,8 +144,7 @@ async def reserve(reservation: ReservationRequest):
 async def get_active_reservations(user_id: int):
     try:
         now = datetime.now().isoformat()
-        reservations = supabase.table("Bookings").select("*").eq("user_id", user_id).gte("out_time", now).execute()
-
+        reservations = supabase.table("Bookings").select("id, property_id, user_id, in_time, out_time, status").eq("user_id", user_id).gte("out_time", now).execute()
 
         if not reservations.data:
             return JSONResponse(content={"reservations": []}, status_code=200)
@@ -156,6 +161,7 @@ async def get_active_reservations(user_id: int):
             if property_details.data:
                 property = property_details.data[0]
                 active_reservations.append({
+                    "id": reservation["id"],
                     "property_id": reservation["property_id"],
                     "property_name": property["name"],
                     "in_time": reservation["in_time"],
@@ -183,3 +189,17 @@ async def update_expired_reservations():
 async def trigger_update_reservations(background_tasks: BackgroundTasks):
     background_tasks.add_task(update_expired_reservations)
     return {"message": "Actualización de reservas caducadas iniciada"}
+
+@app.post("/feedback")
+async def submit_feedback(feedback: FeedbackRequest):
+    try:
+        response = supabase.table("Feedback").insert({
+            "id_booking": feedback.id_booking,
+            "id_property": feedback.id_property,
+            "comments": feedback.comments,
+            "rating": feedback.rating
+        }).execute()
+
+        return JSONResponse(content={"message": "Feedback guardado"}, status_code=201)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
