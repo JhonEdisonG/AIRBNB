@@ -190,6 +190,39 @@ async def trigger_update_reservations(background_tasks: BackgroundTasks):
     background_tasks.add_task(update_expired_reservations)
     return {"message": "Actualización de reservas caducadas iniciada"}
 
+@app.get("/past-reservations/{user_id}")
+async def get_past_reservations(user_id: int):
+    try:
+        now = datetime.now().isoformat()
+        reservations = supabase.table("Bookings").select("*").eq("user_id", user_id).lt("out_time", now).execute()
+
+        if not reservations.data:
+            return JSONResponse(content={"reservations": []}, status_code=200)
+
+        past_reservations = []
+        for reservation in reservations.data:
+            property_details = (
+                supabase.table("Property")
+                .select("id, name")
+                .eq("id", reservation["property_id"])
+                .execute()
+            )
+
+            if property_details.data:
+                property = property_details.data[0]
+                past_reservations.append({
+                    "id": reservation["id"],
+                    "property_id": reservation["property_id"],
+                    "property_name": property["name"],
+                    "in_time": reservation["in_time"],
+                    "out_time": reservation["out_time"],
+                    "status": reservation["status"]
+                })
+
+        return JSONResponse(content={"reservations": past_reservations}, status_code=200)
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
 @app.post("/feedback")
 async def submit_feedback(feedback: FeedbackRequest):
     try:

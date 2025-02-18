@@ -19,7 +19,7 @@
   </header>
 
   <main class="content">
-    <h2 class="section-title">Mis Reservas Activas</h2>
+    <h2 class="section-title">Mis Reservas</h2>
     <div id="reservations-container" class="grid-container">
     </div>
   </main>
@@ -30,26 +30,11 @@
     
   <script>
     const properties = {
-      1: {
-        img: 'https://images.ctfassets.net/8lc7xdlkm4kt/33L5l2aTXdJAAEfw55n0Yh/7472faf6b498fdc11091fc65a5c69165/render-sobre-planos-saint-michel.jpg',
-        coordinates: [6.2088, -75.5679],
-      },
-      2: {
-        img: 'https://media-luna-hostel.cartagena-hotels.net/data/Photos/1080x700w/10392/1039228/1039228984/cartagena-media-luna-hostel-photo-1.JPEG',
-        coordinates: [10.422385, -75.544984],
-      },
-      3: {
-        img: 'https://latinexclusive.com/sites/default/files/styles/main_property_slide/public/api_file_downloads/3862061_1.jpg?itok=qxmdZ3oA',
-        coordinates: [4.711, -74.0721],
-      },
-      4: {
-        img: 'https://asoaturquindio.com/wp-content/uploads/2023/09/cabanas-la-herradura-4-1.jpg',
-        coordinates: [4.845385, -75.582560],
-      },
-      5: {
-        img: 'https://cf.bstatic.com/xdata/images/hotel/max500/151251581.jpg?k=02b942afead8be7bea67cd35453662d8a6ae787336565b884c55aca6dbedcd08&o=',
-        coordinates: [11.244911, -74.211768],
-      }
+      1: { img: 'https://images.ctfassets.net/8lc7xdlkm4kt/33L5l2aTXdJAAEfw55n0Yh/7472faf6b498fdc11091fc65a5c69165/render-sobre-planos-saint-michel.jpg', coordinates: [6.2088, -75.5679] },
+      2: { img: 'https://media-luna-hostel.cartagena-hotels.net/data/Photos/1080x700w/10392/1039228/1039228984/cartagena-media-luna-hostel-photo-1.JPEG', coordinates: [10.422385, -75.544984] },
+      3: { img: 'https://latinexclusive.com/sites/default/files/styles/main_property_slide/public/api_file_downloads/3862061_1.jpg?itok=qxmdZ3oA', coordinates: [4.711, -74.0721] },
+      4: { img: 'https://asoaturquindio.com/wp-content/uploads/2023/09/cabanas-la-herradura-4-1.jpg', coordinates: [4.845385, -75.582560] },
+      5: { img: 'https://cf.bstatic.com/xdata/images/hotel/max500/151251581.jpg?k=02b942afead8be7bea67cd35453662d8a6ae787336565b884c55aca6dbedcd08&o=', coordinates: [11.244911, -74.211768] }
     };
 
     const userId = localStorage.getItem('userId');
@@ -62,62 +47,81 @@
     async function fetchActiveReservations(userId) {
       try {
           const response = await fetch(`/active-reservations/${userId}`);
-          const data = await response.json();
-          return data.reservations;
+          return await response.json();
       } catch (error) {
-          console.error('Error al obtener las reservas:', error);
-          return [];
+          console.error('Error en reservas activas:', error);
+          return { reservations: [] };
+      }
+    }
+
+    async function fetchPastReservations(userId) {
+      try {
+          const response = await fetch(`/past-reservations/${userId}`);
+          return await response.json();
+      } catch (error) {
+          console.error('Error en reservas pasadas:', error);
+          return { reservations: [] };
       }
     }
 
     async function loadReservations() {
-      const reservations = await fetchActiveReservations(userId);
-      const reservationsContainer = document.getElementById('reservations-container');
+      const active = await fetchActiveReservations(userId);
+      const past = await fetchPastReservations(userId);
+      const container = document.getElementById('reservations-container');
+      container.innerHTML = '';
 
-      if (reservations.length === 0) {
-          reservationsContainer.innerHTML = '<p>No tienes reservas activas.</p>';
-          return;
+      if (active.reservations.length > 0) {
+          container.innerHTML += '<h3>Reservas Activas</h3>';
+          active.reservations.forEach(reservation => renderReservation(reservation, false));
       }
 
-      reservations.forEach(reservation => {
-          const propertyInfo = properties[reservation.property_id] || {
-              img: 'URL_imagen_por_defecto',
-              coordinates: [0, 0],
-              amenities: []
-          };
+    
+      if (past.reservations.length > 0) {
+          container.innerHTML += '<h3>Reservas Pasadas</h3>';
+          past.reservations.forEach(reservation => renderReservation(reservation, true));
+      }
 
-          const card = document.createElement('div');
-          card.classList.add('card');
+      if (active.reservations.length === 0 && past.reservations.length === 0) {
+          container.innerHTML = '<p>No tienes reservas.</p>';
+      }
+    }
 
-          card.innerHTML = `
-              <img src="${propertyInfo.img}" alt="${reservation.property_name}">
-              <h3>${reservation.property_name}</h3>
-              <p>Fecha de entrada: ${reservation.in_time}</p>
-              <p>Fecha de salida: ${reservation.out_time}</p>
-              <p>Estado: ${reservation.status}</p>
-              ${propertyInfo.amenities ? 
-                `<ul>${propertyInfo.amenities.map(amenity => `<li>${amenity}</li>`).join('')}</ul>` 
-                : ''}
-              <a href="https://www.google.com/maps/dir/?api=1&destination=${propertyInfo.coordinates[0]},${propertyInfo.coordinates[1]}" 
-                target="_blank" 
-                class="directions-btn">
-                Cómo llegar
-              </a>
-              <button class="directions-btn" data-booking-id="${reservation.id}" data-property-id="${reservation.property_id}">
-              Dejar Feedback
-              </button>
-          `;
+    function renderReservation(reservation, isPast) {
+      const property = properties[reservation.property_id] || { img: '', coordinates: [0, 0] };
+      const card = document.createElement('div');
+      card.classList.add('card');
 
-          reservationsContainer.appendChild(card);
-      });
+      card.innerHTML = `
+          <img src="${property.img}" alt="${reservation.property_name}">
+          <h3>${reservation.property_name}</h3>
+          <p>Entrada: ${reservation.in_time}</p>
+          <p>Salida: ${reservation.out_time}</p>
+          <p>Estado: ${reservation.status}</p>
+          ${!isPast ? 
+              `<a href="https://www.google.com/maps/dir/?api=1&destination=${property.coordinates[0]},${property.coordinates[1]}" 
+                 target="_blank" 
+                 class="directions-btn">
+                  Cómo llegar
+              </a>` 
+              : ''}
+          ${isPast ? 
+              `<button class="directions-btn" 
+                      data-booking-id="${reservation.id}" 
+                      data-property-id="${reservation.property_id}">
+                  Dejar Feedback
+              </button>` 
+              : ''}
+      `;
 
-      document.querySelectorAll('.directions-btn').forEach(button => {
-          button.addEventListener('click', (e) => {
-              const bookingId = e.target.getAttribute('data-booking-id');
-              const propertyId = e.target.getAttribute('data-property-id');
+      document.getElementById('reservations-container').appendChild(card);
+
+      if (isPast) {
+          card.querySelector('.directions-btn').addEventListener('click', (e) => {
+              const bookingId = e.target.dataset.bookingId;
+              const propertyId = e.target.dataset.propertyId;
               window.location.href = `/paginas/feedback.html?booking_id=${bookingId}&property_id=${propertyId}`;
           });
-      });
+      }
     }
 
     loadReservations();
