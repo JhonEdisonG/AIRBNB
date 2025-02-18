@@ -14,8 +14,9 @@
       <img src="https://cdn-icons-png.flaticon.com/512/2111/2111320.png" alt="Logo">
       AIRBNB JH-LS
     </h1>
-  <nav>
-    <a href="/paginas/page.html" class="back-btn">← Volver al Inicio</a>
+    <nav>
+      <a href="/paginas/page.html" class="back-btn">← Volver al Inicio</a>
+    </nav>
   </header>
 
   <main class="content">
@@ -28,6 +29,12 @@
       <p id="property-rating"></p>
       <ul id="property-amenities"></ul>
       <a id="reserve-btn" href="reserva-bef.html" class="directions-btn">Reservar</a>
+
+      <!-- Sección de Comentarios y Calificaciones -->
+      <h3>Comentarios y Calificaciones</h3>
+      <div id="feedback-section">
+        <!-- Aquí se mostrarán los comentarios y calificaciones -->
+      </div>
     </div>
 
     <div id="map" class="map-container"></div>
@@ -48,7 +55,6 @@
         coordinates: [6.2088, -75.5679],
         address: 'Cl. 9 #37, El Poblado, Medellín, Antioquia',
         amenities: ['Wi-Fi', 'Cocina equipada', 'Piscina', 'Estacionamiento'],
-        rating: '4.8'
       },
       2: {
         title: 'Casa colonial en Cartagena',
@@ -58,7 +64,6 @@
         coordinates: [10.422385, -75.544984],
         address: '10-46 Media Luna 10, Getsemaní, Cartagena de Indias, Bolívar',
         amenities: ['Wi-Fi', 'Terraza', 'Aire acondicionado', 'Desayuno incluido'],
-        rating: '4.7'
       },
       3: {
         title: 'Loft en Bogotá',
@@ -68,7 +73,6 @@
         coordinates: [4.711, -74.0721],
         address: 'Av Suba #125-98, Bogotá',
         amenities: ['Wi-Fi', 'Gimnasio', 'Ascensor', 'Seguridad 24/7'],
-        rating: '4.5'
       },
       4: {
         title: 'Cabaña en el Eje Cafetero',
@@ -78,7 +82,6 @@
         coordinates: [4.845385, -75.582560],
         address: '2 kilómetros antes de termales Santa Rosa por la desviación a la Paloma vereda, San RAMON, Santa Rosa de Cabal, Risaralda (Cabañas La Herradura)',
         amenities: ['Wi-Fi', 'Chimenea', 'Jardín', 'Cafetera'],
-        rating: '4.9'
       },
       5: {
         title: 'Hostal en Santa Marta',
@@ -88,7 +91,6 @@
         coordinates: [11.244911, -74.211768],
         address: 'Cl. 14 #3-58, Comuna 2, Santa Marta, Magdalena',
         amenities: ['Wi-Fi', 'Cocina compartida', 'Terraza', 'Desayuno incluido'],
-        rating: '4.3'
       }
     };
 
@@ -102,30 +104,59 @@
       document.getElementById('property-price').textContent = property.price;
       document.getElementById('property-description').textContent = property.description;
       document.getElementById('property-address').textContent = `Dirección: ${property.address}`;
-      document.getElementById('property-rating').textContent = `Calificación: ${property.rating}`;
 
       const amenitiesList = document.getElementById('property-amenities');
-        property.amenities.forEach(amenity => {
+      property.amenities.forEach(amenity => {
         const li = document.createElement('li');
-      li.textContent = amenity;
-      amenitiesList.appendChild(li);
-    });
+        li.textContent = amenity;
+        amenitiesList.appendChild(li);
+      });
 
-    const reserveBtn = document.getElementById('reserve-btn');
-    reserveBtn.href = `/paginas/reserva-bef.html?id=${propertyId}`;
+      const reserveBtn = document.getElementById('reserve-btn');
+      reserveBtn.href = `/paginas/reserva-bef.html?id=${propertyId}`;
 
-    const map = L.map('map').setView(property.coordinates, 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-  
-    L.marker(property.coordinates).addTo(map)
-      .bindPopup(property.title)
-      .openPopup();
-  } 
-  else {
-  document.querySelector('.property-details').innerHTML = '<p>Propiedad no encontrada.</p>';
-}
+      const map = L.map('map').setView(property.coordinates, 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      L.marker(property.coordinates).addTo(map)
+        .bindPopup(property.title)
+        .openPopup();
+
+      // Cargar los comentarios y calificaciones
+      loadFeedback(propertyId);
+    } else {
+      document.querySelector('.property-details').innerHTML = '<p>Propiedad no encontrada.</p>';
+    }
+
+    // Función para cargar los comentarios y calificaciones
+    async function loadFeedback(propertyId) {
+      try {
+        const response = await fetch(`/feedback/${propertyId}`);
+        const data = await response.json();
+        const feedbackSection = document.getElementById('feedback-section');
+
+        if (data.feedback && data.feedback.length > 0) {
+          feedbackSection.innerHTML = ''; // Limpiar el contenido anterior
+
+          data.feedback.forEach(feedback => {
+            const feedbackItem = document.createElement('div');
+            feedbackItem.classList.add('feedback-item');
+            feedbackItem.innerHTML = `
+              <p><strong>Calificación:</strong> ${'⭐️'.repeat(feedback.rating)}</p>
+              <p><strong>Comentario:</strong> ${feedback.comments}</p>
+            `;
+            feedbackSection.appendChild(feedbackItem);
+          });
+        } else {
+          feedbackSection.innerHTML = '<p>No hay comentarios aún.</p>';
+        }
+      } catch (error) {
+        console.error('Error al cargar los comentarios:', error);
+        feedbackSection.innerHTML = '<p>Error al cargar los comentarios.</p>';
+      }
+    }
   </script>
 </body>
 </html>

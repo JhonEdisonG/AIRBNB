@@ -236,3 +236,12 @@ async def submit_feedback(feedback: FeedbackRequest):
         return JSONResponse(content={"message": "Feedback guardado"}, status_code=201)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/feedback/{property_id}")
+async def get_feedback(property_id: int):
+    try:
+        response = supabase.table("Feedback").select("*").eq("id_property", property_id).execute()
+        feedback_list = response.data
+        return JSONResponse(content={"feedback": feedback_list}, status_code=200)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
