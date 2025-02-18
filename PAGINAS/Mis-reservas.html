@@ -71,13 +71,11 @@
       container.innerHTML = '';
 
       if (active.reservations.length > 0) {
-          container.innerHTML += '<h3>Reservas Activas</h3>';
           active.reservations.forEach(reservation => renderReservation(reservation, false));
       }
 
     
       if (past.reservations.length > 0) {
-          container.innerHTML += '<h3>Reservas Pasadas</h3>';
           past.reservations.forEach(reservation => renderReservation(reservation, true));
       }
 
